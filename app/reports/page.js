@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { 
-  BarChart3, 
-  ChevronRight, 
-  Search, 
-  FolderRoot, 
-  ArrowLeft,
-  Clock,
-  Share2,
-  FileText,
-  Table as TableIcon
+import {
+    BarChart3,
+    ChevronRight,
+    Search,
+    FolderRoot,
+    ArrowLeft,
+    Clock,
+    Share2,
+    FileText,
+    Table as TableIcon
 } from 'lucide-react';
 import api from '@/config/api';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -20,12 +20,12 @@ import { Badge } from "@/components/ui/badge";
 
 // --- FIXED IMPORTS ---
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; 
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 export default function ReportsListPage() {
     const [projects, setProjects] = useState([]);
-    const [users, setUsers] = useState([]); 
+    const [users, setUsers] = useState([]);
     const [timesheetData, setTimesheetData] = useState([]);
     const [filteredProjects, setFilteredProjects] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -72,7 +72,7 @@ export default function ReportsListPage() {
     const exportToPDF = () => {
         try {
             const doc = new jsPDF();
-            
+
             // Header for the PDF
             doc.setFontSize(18);
             doc.text("Timesheet Report", 14, 15);
@@ -132,7 +132,7 @@ export default function ReportsListPage() {
             try {
                 const [projRes, userRes] = await Promise.all([
                     api.get("project"),
-                    api.get("users") 
+                    api.get("users")
                 ]);
                 const projData = projRes.data.project || [];
                 setProjects(projData);
@@ -223,9 +223,9 @@ export default function ReportsListPage() {
                                 </button>
                                 <div className="relative w-full md:w-[350px]">
                                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                                    <Input 
-                                        type="text" 
-                                        placeholder="Search projects..." 
+                                    <Input
+                                        type="text"
+                                        placeholder="Search projects..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className="bg-white pl-10 border-[#e3e9ef]"
@@ -294,9 +294,9 @@ export default function ReportsListPage() {
                             <div className="mb-6 grid grid-cols-1 md:grid-cols-6 gap-4 rounded-lg border bg-white p-4 items-end">
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">Period</label>
-                                    <select 
-                                        className="w-full h-9 rounded-md border px-3 text-[12px]" 
-                                        value={filters.period} 
+                                    <select
+                                        className="w-full h-9 rounded-md border px-3 text-[12px]"
+                                        value={filters.period}
                                         onChange={(e) => handlePeriodChange(e.target.value)}
                                     >
                                         <option value="custom">Custom Range</option>
@@ -307,35 +307,35 @@ export default function ReportsListPage() {
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">From</label>
-                                    <Input 
-                                        type="date" 
+                                    <Input
+                                        type="date"
                                         disabled={filters.period !== "custom"}
-                                        value={filters.fromDate} 
-                                        onChange={(e) => setFilters({...filters, fromDate: e.target.value})} 
-                                        className="h-9" 
+                                        value={filters.fromDate}
+                                        onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
+                                        className="h-9"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">To</label>
-                                    <Input 
-                                        type="date" 
+                                    <Input
+                                        type="date"
                                         disabled={filters.period !== "custom"}
-                                        value={filters.toDate} 
-                                        onChange={(e) => setFilters({...filters, toDate: e.target.value})} 
-                                        className="h-9" 
+                                        value={filters.toDate}
+                                        onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
+                                        className="h-9"
                                     />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">Project</label>
-                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.projectId} onChange={(e) => setFilters({...filters, projectId: e.target.value})}>
+                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.projectId} onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}>
                                         <option value="all">All Projects</option>
                                         {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Member</label>
-                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.userId} onChange={(e) => setFilters({...filters, userId: e.target.value})}>
-                                        <option value="all">All Members</option>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Employee</label>
+                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.userId} onChange={(e) => setFilters({ ...filters, userId: e.target.value })}>
+                                        <option value="all">All Employees</option>
                                         {users.map(u => <option key={u._id} value={u._id}>{u.name}({u.role})</option>)}
                                     </select>
                                 </div>
@@ -348,23 +348,27 @@ export default function ReportsListPage() {
                                 <table className="w-full text-left">
                                     <thead className="bg-[#f9fbff] text-[11px] font-bold uppercase border-b">
                                         <tr>
-                                            <th className="px-6 py-4">Member</th>
-                                            <th className="px-6 py-4">Project</th>
                                             <th className="px-6 py-4 text-center">Date</th>
+                                            <th className="px-6 py-4">Project</th>
+                                            <th className="px-6 py-4">Milestone name</th>
+                                            <th className="px-6 py-4">Task name</th>
+                                            <th className="px-6 py-4">Employee</th>
                                             <th className="px-6 py-4 text-center">Hours</th>
-                                            <th className="px-6 py-4">Status</th>
+                                            {/* <th className="px-6 py-4">Status</th> */}
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
                                         {timesheetData.length > 0 ? timesheetData.map((ts, idx) => (
                                             <tr key={idx} className="hover:bg-[#fcfdfe]">
-                                                <td className="px-6 py-4 font-bold">{ts.userName}</td>
-                                                <td className="px-6 py-4 text-slate-600">{ts.projectName}</td>
                                                 <td className="px-6 py-4 text-center">{new Date(ts.date).toLocaleDateString()}</td>
+                                                <td className="px-6 py-4 text-slate-600">{ts.projectName}</td>
+                                                <td className="px-6 py-4 text-slate-600">{ts?.milestoneName || "-"}</td>
+                                                <td className="px-6 py-4 text-slate-600">{ts?.taskName || "-"}</td>
+                                                <td className="px-6 py-4 font-bold">{ts.userName}</td>
                                                 <td className="px-6 py-4 text-center text-[#0091ff] font-bold">{ts.hours}h</td>
-                                                <td className="px-6 py-4">
+                                                {/* <td className="px-6 py-4">
                                                     <Badge variant={ts.status === 'Approved' ? 'default' : 'outline'}>{ts.status}</Badge>
-                                                </td>
+                                                </td> */}
                                             </tr>
                                         )) : (
                                             <tr><td colSpan={5} className="py-20 text-center text-slate-400">No records found.</td></tr>

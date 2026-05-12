@@ -51,6 +51,12 @@ export function MainNav({ closeSidebar }) {
       icon: CalendarClock ,
       permission: null,
     },
+     {
+      title: "overview",
+      href: "/overview",
+      icon: CalendarClock ,
+      permission: null,
+    },
     {
       title: "Projects",
       href: "/projects",
