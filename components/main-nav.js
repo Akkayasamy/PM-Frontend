@@ -40,19 +40,19 @@ export function MainNav({ closeSidebar }) {
       permission: null, // Everyone can access
     },
     {
-      title: "reports",
+      title: "Reports",
       href: "/reports",
       icon: FileText,
       permission: null,
     },
     {
-      title: "timesheets",
+      title: "Timesheets",
       href: "/timesheets",
       icon: CalendarClock ,
       permission: null,
     },
      {
-      title: "overview",
+      title: "Overview",
       href: "/overview",
       icon: CalendarClock ,
       permission: null,
