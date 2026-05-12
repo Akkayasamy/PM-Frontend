@@ -36,8 +36,37 @@ export default function ReportsListPage() {
         fromDate: "",
         toDate: "",
         projectId: "all",
-        userId: "all"
+        userId: "all",
+        period: "custom" // Added period filter
     });
+
+    // Helper to calculate dates based on preset periods
+    const handlePeriodChange = (period) => {
+        const today = new Date();
+        let from = "";
+        let to = today.toISOString().split('T')[0];
+
+        if (period === "weekly") {
+            const lastWeek = new Date();
+            lastWeek.setDate(today.getDate() - 7);
+            from = lastWeek.toISOString().split('T')[0];
+        } else if (period === "monthly") {
+            const lastMonth = new Date();
+            lastMonth.setMonth(today.getMonth() - 1);
+            from = lastMonth.toISOString().split('T')[0];
+        } else if (period === "yearly") {
+            const lastYear = new Date();
+            lastYear.setFullYear(today.getFullYear() - 1);
+            from = lastYear.toISOString().split('T')[0];
+        }
+
+        setFilters({
+            ...filters,
+            period: period,
+            fromDate: from || (period === "custom" ? filters.fromDate : ""),
+            toDate: to || (period === "custom" ? filters.toDate : "")
+        });
+    };
 
     // --- FIXED PDF EXPORT LOGIC ---
     const exportToPDF = () => {
@@ -60,7 +89,6 @@ export default function ReportsListPage() {
                 ts.status || "N/A"
             ]);
 
-            // Use the imported autoTable function directly instead of doc.autoTable
             autoTable(doc, {
                 head: [tableColumn],
                 body: tableRows,
@@ -263,14 +291,39 @@ export default function ReportsListPage() {
                                 )}
                             </div>
 
-                            <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4 rounded-lg border bg-white p-4 items-end">
+                            <div className="mb-6 grid grid-cols-1 md:grid-cols-6 gap-4 rounded-lg border bg-white p-4 items-end">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Period</label>
+                                    <select 
+                                        className="w-full h-9 rounded-md border px-3 text-[12px]" 
+                                        value={filters.period} 
+                                        onChange={(e) => handlePeriodChange(e.target.value)}
+                                    >
+                                        <option value="custom">Custom Range</option>
+                                        <option value="weekly">Last 7 Days</option>
+                                        <option value="monthly">Last 30 Days</option>
+                                        <option value="yearly">Last Year</option>
+                                    </select>
+                                </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">From</label>
-                                    <Input type="date" value={filters.fromDate} onChange={(e) => setFilters({...filters, fromDate: e.target.value})} className="h-9" />
+                                    <Input 
+                                        type="date" 
+                                        disabled={filters.period !== "custom"}
+                                        value={filters.fromDate} 
+                                        onChange={(e) => setFilters({...filters, fromDate: e.target.value})} 
+                                        className="h-9" 
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">To</label>
-                                    <Input type="date" value={filters.toDate} onChange={(e) => setFilters({...filters, toDate: e.target.value})} className="h-9" />
+                                    <Input 
+                                        type="date" 
+                                        disabled={filters.period !== "custom"}
+                                        value={filters.toDate} 
+                                        onChange={(e) => setFilters({...filters, toDate: e.target.value})} 
+                                        className="h-9" 
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-slate-400 uppercase">Project</label>
