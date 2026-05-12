@@ -90,7 +90,7 @@ export default function TimesheetPage() {
         api.get(`/timesheet/user/${user?._id}`),
         api.get("/project"),
         api.get("/milestone"),
-        api.get(`/task`), 
+        api.get(`/task`),
       ]);
       setTimesheets(tsRes.data.timesheets || []);
       setProjects(projRes.data.project || []);
@@ -107,50 +107,45 @@ export default function TimesheetPage() {
     if (user?._id) fetchData();
   }, [user]);
 
-  // FIXED: Fetch subtasks using the specific taskId field (not the technical _id)
+  // Fetch subtasks logic
   useEffect(() => {
     const fetchSubtasks = async () => {
-      // Find the actual task object to get its internal taskId property if needed
-      // or use the formData.taskId directly if that is what your backend expects
       if (!formData.taskId) {
         setSubtasks([]);
         return;
       }
-
       try {
-        // Find the task object from our list to extract the specific 'taskId' field
         const selectedTask = tasks.find(t => t._id === formData.taskId);
         const targetId = selectedTask?.taskId || formData.taskId;
-
         const response = await api.get(`subtask/task/${targetId}`);
         setSubtasks(response.data.subTasks || []);
       } catch (err) {
-        console.error("Subtask fetch error:", err);
         setSubtasks([]);
       }
     };
-
     fetchSubtasks();
   }, [formData.taskId, tasks]);
 
-  // Cascading Logic for UI
+  // Cascading Logic
   const filteredMilestones = useMemo(() => {
-    return milestones.filter((m) => m.projectId === formData.projectId || m.projectId?._id === formData.projectId);
+    return milestones.filter((m) => {
+      const pId = m.projectId?._id || m.projectId;
+      return pId === formData.projectId;
+    });
   }, [milestones, formData.projectId]);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((t) => {
-        const pId = t.projectId?._id || t.projectId;
-        const mId = t.milestoneId?._id || t.milestoneId;
-        return pId === formData.projectId && (!formData.milestoneId || mId === formData.milestoneId);
+      const pId = t.projectId?._id || t.projectId;
+      const mId = t.milestoneId?._id || t.milestoneId;
+      return pId === formData.projectId && (!formData.milestoneId || mId === formData.milestoneId);
     });
   }, [tasks, formData.projectId, formData.milestoneId]);
 
-  // Table Filtering logic
   const tableData = useMemo(() => {
     return timesheets.filter((ts) => {
-      const matchesSearch = ts.description?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           ts.projectId?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = ts.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ts.projectId?.name?.toLowerCase().includes(searchTerm.toLowerCase());
       const tsProjectId = ts.projectId?._id || ts.projectId;
       const matchesProject = projectFilter === "all" || tsProjectId === projectFilter;
       return matchesSearch && matchesProject;
@@ -249,7 +244,6 @@ export default function TimesheetPage() {
     <ProtectedRoute requiredPermission="view_timesheets">
       <DashboardShell>
         <div className="flex flex-col gap-6">
-          {/* Header matching ERP standard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-slate-900">Timesheets</h1>
@@ -269,7 +263,8 @@ export default function TimesheetPage() {
                 <Button variant="outline" onClick={exportToCSV} disabled={tableData.length === 0} className="text-[13px]">
                   <FileText className="mr-2 h-4 w-4" /> Export
                 </Button>
-                <Button className="bg-sky-600 hover:bg-sky-700 text-white text-[13px]" onClick={handleOpenNew}>
+                {/* CHANGED: Primary color to Indigo to match Task Page style */}
+                <Button onClick={handleOpenNew}>
                   <Plus className="mr-2 h-4 w-4" /> Log Time
                 </Button>
               </div>
@@ -293,8 +288,8 @@ export default function TimesheetPage() {
             <Badge variant="outline" className="bg-white px-3 py-1 text-slate-500 font-normal border-slate-200 h-8">
               User: <span className="font-semibold ml-1 text-indigo-700">{user?.name}</span>
             </Badge>
-            { (projectFilter !== "all" || searchTerm) && (
-              <Button variant="ghost" size="sm" onClick={() => {setProjectFilter("all"); setSearchTerm("");}} className="h-8">
+            {(projectFilter !== "all" || searchTerm) && (
+              <Button variant="ghost" size="sm" onClick={() => { setProjectFilter("all"); setSearchTerm(""); }} className="h-8">
                 <X className="h-4 w-4 mr-1" /> Clear
               </Button>
             )}
@@ -316,52 +311,53 @@ export default function TimesheetPage() {
                 {tableData.length === 0 ? (
                   <TableRow><TableCell colSpan={6} className="text-center py-10 text-slate-400">No entries found.</TableCell></TableRow>
                 ) : (
-                tableData.map((ts) => (
-                  <TableRow key={ts._id} className="group border-slate-100">
-                    <TableCell className="text-[13px] font-medium text-slate-700">
+                  tableData.map((ts) => (
+                    <TableRow key={ts._id} className="group border-slate-100">
+                      <TableCell className="text-[13px] font-medium text-slate-700">
                         {new Date(ts.date).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex flex-col">
-                            <span className="text-[13px] font-semibold text-sky-700">{ts.projectId?.name || "N/A"}</span>
-                            <span className="text-[11px] text-slate-400">{ts.milestoneId?.name || "General"}</span>
+                          {/* Changed link color to indigo to match task style */}
+                          <span className="text-[13px] font-semibold text-indigo-700">{ts.projectId?.name || "N/A"}</span>
+                          <span className="text-[11px] text-slate-400">{ts.milestoneId?.name || "General"}</span>
                         </div>
-                    </TableCell>
-                    <TableCell>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex flex-col gap-1">
                           <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal text-[11px] w-fit">
-                              {ts.taskId?.title || "Direct Work"}
+                            {ts.taskId?.title || "Direct Work"}
                           </Badge>
                           {ts.subTaskId && (
-                             <span className="text-[10px] text-indigo-500 font-medium ml-1">↳ {ts.subTaskId?.title}</span>
+                            <span className="text-[10px] text-indigo-500 font-medium ml-1">↳ {ts.subTaskId?.title}</span>
                           )}
                         </div>
-                    </TableCell>
-                    <TableCell className="text-[13px] text-slate-600 italic max-w-[300px] truncate">
+                      </TableCell>
+                      <TableCell className="text-[13px] text-slate-600 italic max-w-[300px] truncate">
                         {ts.description}
-                    </TableCell>
-                    <TableCell className="text-center">
+                      </TableCell>
+                      <TableCell className="text-center">
                         <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 font-semibold">{ts.hours}h</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[140px]">
-                          <DropdownMenuItem onClick={() => handleEdit(ts)} className="text-slate-600 cursor-pointer">
-                            <Pencil className="mr-2 h-4 w-4"/> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer">
-                            <Trash className="mr-2 h-4 w-4"/> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                )))}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[140px]">
+                            <DropdownMenuItem onClick={() => handleEdit(ts)} className="text-slate-600 cursor-pointer">
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer">
+                              <Trash className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )))}
               </TableBody>
             </Table>
           </div>
@@ -370,11 +366,12 @@ export default function TimesheetPage() {
         {/* Dialog for entry */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-xl">
-            <DialogHeader className="bg-indigo-900 p-6 text-white sticky top-0 z-10">
+            {/* CHANGED: Header background to a dark slate/indigo for higher contrast */}
+            <DialogHeader className=" p-3 text-slate-900 ">
               <DialogTitle className="text-xl flex items-center gap-2">
-                <Clock className="w-5 h-5 text-sky-400" /> {editingId ? "Edit Time Entry" : "Log New Time"}
+                <Clock className="w-5 h-5 " /> {editingId ? "Edit Time Entry" : "Log New Time"}
               </DialogTitle>
-              <p className="text-indigo-200 text-xs mt-1">Fill in the details for your work activity.</p>
+              <p className="text-slate-400 text-xs mt-1">Fill in the details for your work activity.</p>
             </DialogHeader>
 
             <div className="p-6 grid gap-5 bg-white">
@@ -391,7 +388,7 @@ export default function TimesheetPage() {
 
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase font-bold text-slate-400">Project</Label>
-                <Select value={formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, projectId: val, milestoneId: "", taskId: "", subTaskId: ""}))}>
+                <Select value={formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, projectId: val, milestoneId: "", taskId: "", subTaskId: "" }))}>
                   <SelectTrigger className="h-9 text-[13px] border-slate-200">
                     <SelectValue placeholder="Select Project" />
                   </SelectTrigger>
@@ -404,7 +401,7 @@ export default function TimesheetPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-[11px] uppercase font-bold text-slate-400">Milestone</Label>
-                  <Select value={formData.milestoneId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, milestoneId: val, taskId: "", subTaskId: ""}))}>
+                  <Select value={formData.milestoneId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, milestoneId: val, taskId: "", subTaskId: "" }))}>
                     <SelectTrigger className="h-9 text-[13px] border-slate-200">
                       <SelectValue placeholder="Select Milestone" />
                     </SelectTrigger>
@@ -415,7 +412,7 @@ export default function TimesheetPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-[11px] uppercase font-bold text-slate-400">Task</Label>
-                  <Select value={formData.taskId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, taskId: val, subTaskId: ""}))}>
+                  <Select value={formData.taskId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, taskId: val, subTaskId: "" }))}>
                     <SelectTrigger className="h-9 text-[13px] border-slate-200">
                       <SelectValue placeholder="Select Task" />
                     </SelectTrigger>
@@ -428,15 +425,15 @@ export default function TimesheetPage() {
 
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase font-bold text-slate-400">Subtask (Optional)</Label>
-                <Select value={formData.subTaskId} disabled={!formData.taskId} onValueChange={(val) => setFormData(prev => ({...prev, subTaskId: val}))}>
+                <Select value={formData.subTaskId} disabled={!formData.taskId} onValueChange={(val) => setFormData(prev => ({ ...prev, subTaskId: val }))}>
                   <SelectTrigger className="h-9 text-[13px] border-slate-200">
                     <SelectValue placeholder="Select Subtask" />
                   </SelectTrigger>
                   <SelectContent>
                     {subtasks.length > 0 ? (
-                        subtasks.map(s => <SelectItem key={s._id} value={s._id}>{s.title}</SelectItem>)
+                      subtasks.map(s => <SelectItem key={s._id} value={s._id}>{s.title}</SelectItem>)
                     ) : (
-                        <SelectItem value="none" disabled>No subtasks found</SelectItem>
+                      <SelectItem value="none" disabled>No subtasks found</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -444,9 +441,9 @@ export default function TimesheetPage() {
 
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase font-bold text-slate-400">Work Description</Label>
-                <Textarea 
+                <Textarea
                   name="description"
-                  placeholder="Describe your progress..." 
+                  placeholder="Describe your progress..."
                   className="text-[13px] min-h-[100px] resize-none border-slate-200"
                   value={formData.description}
                   onChange={handleInputChange}
@@ -456,7 +453,8 @@ export default function TimesheetPage() {
 
             <DialogFooter className="bg-slate-50 p-4 border-t sticky bottom-0 z-10">
               <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-[13px]">Cancel</Button>
-              <Button className="bg-sky-600 hover:bg-sky-700 text-white px-8 text-[13px] font-semibold" onClick={handleSave} disabled={loading}>
+              {/* CHANGED: Button color to Indigo to match primary action style */}
+              <Button onClick={handleSave} disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {editingId ? "Update Entry" : "Save Entry"}
               </Button>
             </DialogFooter>
