@@ -91,6 +91,7 @@ export default function TasksPage() {
     title: "",
     description: "",
     projectId: "",
+    milestoneId: "",
     reportedDate: "",
     startDate: "",
     endDate: "",
@@ -125,6 +126,7 @@ export default function TasksPage() {
   const [users, setUsers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [milestones, setMilestones] = useState([]);
   const [isSuccess, setSuccess] = useState(false);
 
   // Kanban columns configuration
@@ -184,6 +186,18 @@ export default function TasksPage() {
     };
     loadResponse();
   }, []);
+
+  useEffect(() => {
+    const loadResponse = async () => {
+      try {
+        const response = await api.get("milestone");
+        setMilestones(response.data.milestones);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    loadResponse();
+  }, [isSuccess]);
 
   // Get unique task types and natures for filters
   const taskTypes = useMemo(
@@ -317,6 +331,7 @@ export default function TasksPage() {
       title: "",
       description: "",
       projectId: "",
+      milestoneId: "",
       reportedDate: "",
       startDate: "",
       endDate: "",
@@ -385,6 +400,7 @@ export default function TasksPage() {
       title: task.title || "",
       description: task.description || "",
       projectId: task.projectId || "",
+      milestoneId: task.milestoneId || "",
       reportedDate: task.reportedDate || "",
       startDate: task.startDate || "",
       endDate: task.endDate || "",
@@ -1437,6 +1453,35 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                    {/* ── MILESTONE DROPDOWN (Create) ── */}
+                    <div className="grid gap-2">
+                      <Label htmlFor="milestoneId">Milestone</Label>
+                      <Select
+                        value={formData.milestoneId}
+                        onValueChange={(value) =>
+                          handleSelectChange("milestoneId", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a milestone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {milestones.map((milestone) => (
+                            <SelectItem
+                              key={milestone._id}
+                              value={milestone._id}
+                            >
+                              {milestone.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {/* ── END MILESTONE DROPDOWN ── */}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="status">Task Status</Label>
                       <Select
@@ -1461,9 +1506,7 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="priority">Priority</Label>
                       <Select
@@ -1483,16 +1526,17 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="flex items-center space-x-2 self-end">
-                      <Checkbox
-                        id="active"
-                        checked={formData.active}
-                        onCheckedChange={(checked) =>
-                          handleCheckboxChange("active", checked)
-                        }
-                      />
-                      <Label htmlFor="active">Active</Label>
-                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="active"
+                      checked={formData.active}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange("active", checked)
+                      }
+                    />
+                    <Label htmlFor="active">Active</Label>
                   </div>
                 </TabsContent>
 
@@ -1822,6 +1866,35 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                    {/* ── MILESTONE DROPDOWN (Edit) ── */}
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-milestoneId">Milestone</Label>
+                      <Select
+                        value={formData.milestoneId}
+                        onValueChange={(value) =>
+                          handleSelectChange("milestoneId", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a milestone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {milestones.map((milestone) => (
+                            <SelectItem
+                              key={milestone._id}
+                              value={milestone._id}
+                            >
+                              {milestone.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {/* ── END MILESTONE DROPDOWN ── */}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="edit-status">Task Status</Label>
                       <Select
@@ -1846,9 +1919,7 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="edit-priority">Priority</Label>
                       <Select
@@ -1868,16 +1939,17 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="flex items-center space-x-2 self-end">
-                      <Checkbox
-                        id="edit-active"
-                        checked={formData.active}
-                        onCheckedChange={(checked) =>
-                          handleCheckboxChange("active", checked)
-                        }
-                      />
-                      <Label htmlFor="edit-active">Active</Label>
-                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="edit-active"
+                      checked={formData.active}
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange("active", checked)
+                      }
+                    />
+                    <Label htmlFor="edit-active">Active</Label>
                   </div>
                 </TabsContent>
 
