@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { DashboardShell } from "@/components/dashboard-shell";
 import ProtectedRoute from "@/components/protected-route";
@@ -44,14 +43,11 @@ import {
   Pencil,
   Trash,
   Search,
-  ArrowUpDown,
-  FileText,
-  Calendar,
   Clock,
-  Briefcase,
-  Layers,
-  CheckCircle2,
-  Loader2
+  Loader2,
+  FileText,
+  X,
+  Filter
 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -67,10 +63,11 @@ export default function TimesheetPage() {
   const [projects, setProjects] = useState([]);
   const [milestones, setMilestones] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [subtasks, setSubtasks] = useState([]);
 
   // UI states
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState(null); // Track if editing
+  const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [projectFilter, setProjectFilter] = useState("all");
 
@@ -80,11 +77,12 @@ export default function TimesheetPage() {
     projectId: "",
     milestoneId: "",
     taskId: "",
+    subTaskId: "",
     description: "",
     userId: user?._id || "",
   });
 
-  // Fetch Data
+  // Fetch Initial Data
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -92,12 +90,12 @@ export default function TimesheetPage() {
         api.get(`/timesheet/user/${user?._id}`),
         api.get("/project"),
         api.get("/milestone"),
-        api.get(`/task/user/${user?._id}`),
+        api.get(`/task`), 
       ]);
-      setTimesheets(tsRes.data.timesheets);
-      setProjects(projRes.data.project);
-      setMilestones(msRes.data.milestones);
-      setTasks(taskRes.data.tasks);
+      setTimesheets(tsRes.data.timesheets || []);
+      setProjects(projRes.data.project || []);
+      setMilestones(msRes.data.milestones || []);
+      setTasks(taskRes.data.tasks || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -109,42 +107,71 @@ export default function TimesheetPage() {
     if (user?._id) fetchData();
   }, [user]);
 
-  // Cascading Logic
+  // FIXED: Fetch subtasks using the specific taskId field (not the technical _id)
+  useEffect(() => {
+    const fetchSubtasks = async () => {
+      // Find the actual task object to get its internal taskId property if needed
+      // or use the formData.taskId directly if that is what your backend expects
+      if (!formData.taskId) {
+        setSubtasks([]);
+        return;
+      }
+
+      try {
+        // Find the task object from our list to extract the specific 'taskId' field
+        const selectedTask = tasks.find(t => t._id === formData.taskId);
+        const targetId = selectedTask?.taskId || formData.taskId;
+
+        const response = await api.get(`subtask/task/${targetId}`);
+        setSubtasks(response.data.subTasks || []);
+      } catch (err) {
+        console.error("Subtask fetch error:", err);
+        setSubtasks([]);
+      }
+    };
+
+    fetchSubtasks();
+  }, [formData.taskId, tasks]);
+
+  // Cascading Logic for UI
   const filteredMilestones = useMemo(() => {
-    return milestones.filter((m) => m.projectId === formData.projectId);
+    return milestones.filter((m) => m.projectId === formData.projectId || m.projectId?._id === formData.projectId);
   }, [milestones, formData.projectId]);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter((t) => 
-        t.projectId === formData.projectId && 
-        (!formData.milestoneId || t.milestoneId === formData.milestoneId)
-    );
+    return tasks.filter((t) => {
+        const pId = t.projectId?._id || t.projectId;
+        const mId = t.milestoneId?._id || t.milestoneId;
+        return pId === formData.projectId && (!formData.milestoneId || mId === formData.milestoneId);
+    });
   }, [tasks, formData.projectId, formData.milestoneId]);
 
+  // Table Filtering logic
   const tableData = useMemo(() => {
     return timesheets.filter((ts) => {
-      const matchesSearch = ts.description?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesProject = projectFilter === "all" || ts.projectId?._id === projectFilter;
+      const matchesSearch = ts.description?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           ts.projectId?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      const tsProjectId = ts.projectId?._id || ts.projectId;
+      const matchesProject = projectFilter === "all" || tsProjectId === projectFilter;
       return matchesSearch && matchesProject;
     });
   }, [timesheets, searchTerm, projectFilter]);
 
-  // Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // FIX: Edit functionality
   const handleEdit = (ts) => {
     setEditingId(ts._id);
     setFormData({
       date: new Date(ts.date).toISOString().split("T")[0],
       hours: ts.hours.toString(),
-      projectId: ts.projectId?._id || "",
-      milestoneId: ts.milestoneId?._id || "",
+      projectId: ts.projectId?._id || ts.projectId || "",
+      milestoneId: ts.milestoneId?._id || ts.milestoneId || "",
       taskId: ts.taskId?._id || ts.taskId || "",
-      description: ts.description,
+      subTaskId: ts.subTaskId?._id || ts.subTaskId || "",
+      description: ts.description || "",
       userId: user._id,
     });
     setIsDialogOpen(true);
@@ -158,17 +185,31 @@ export default function TimesheetPage() {
       projectId: "",
       milestoneId: "",
       taskId: "",
+      subTaskId: "",
       description: "",
       userId: user?._id || "",
     });
     setIsDialogOpen(true);
   };
 
+  const handleDeleteTimesheet = async (id) => {
+    if (!confirm("Are you sure you want to delete this log?")) return;
+    try {
+      setLoading(true);
+      await api.delete(`/timesheet/${id}`);
+      toast({ title: "Deleted", description: "Timesheet entry removed successfully." });
+      fetchData();
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to delete entry.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSave = async () => {
     try {
       setLoading(true);
       const payload = { ...formData, userId: user._id };
-      
       if (editingId) {
         await api.put(`/timesheet/${editingId}`, payload);
         toast({ title: "Updated", description: "Timesheet entry updated." });
@@ -176,7 +217,6 @@ export default function TimesheetPage() {
         await api.post("/timesheet", payload);
         toast({ title: "Success", description: "Timesheet entry saved." });
       }
-      
       setIsDialogOpen(false);
       fetchData();
     } catch (err) {
@@ -186,77 +226,116 @@ export default function TimesheetPage() {
     }
   };
 
+  const exportToCSV = () => {
+    const headers = ["Date", "Project", "Milestone", "Task", "Hours", "Description"];
+    const csvRows = tableData.map(ts => [
+      new Date(ts.date).toLocaleDateString(),
+      ts.projectId?.name || "",
+      ts.milestoneId?.name || "",
+      ts.taskId?.title || "",
+      ts.hours,
+      ts.description?.replace(/,/g, ";") || ""
+    ]);
+    const csvContent = [headers.join(","), ...csvRows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `timesheet_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+  };
+
   return (
     <ProtectedRoute requiredPermission="view_timesheets">
       <DashboardShell>
         <div className="flex flex-col gap-6">
-          {/* Header */}
+          {/* Header matching ERP standard */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-slate-900">Timesheets</h1>
-              <p className="text-muted-foreground">Track work hours for projects and tasks.</p>
+              <p className="text-muted-foreground">Manage your work logs and track billable hours.</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search logs..."
-                  className="pl-8 w-[250px] bg-white"
+                  className="pl-8 w-full sm:w-[250px] bg-white text-[13px]"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button className="bg-sky-600 hover:bg-sky-700" onClick={handleOpenNew}>
-                <Plus className="mr-2 h-4 w-4" /> Log Time
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={exportToCSV} disabled={tableData.length === 0} className="text-[13px]">
+                  <FileText className="mr-2 h-4 w-4" /> Export
+                </Button>
+                <Button className="bg-sky-600 hover:bg-sky-700 text-white text-[13px]" onClick={handleOpenNew}>
+                  <Plus className="mr-2 h-4 w-4" /> Log Time
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Filters Bar */}
-          <div className="flex items-center gap-2">
-             <Badge variant="outline" className="bg-white px-3 py-1 text-slate-500 font-normal border-slate-200">
-                Logged as: <span className="font-semibold ml-1 text-indigo-700">{user?.name}</span>
-             </Badge>
-             <Select value={projectFilter} onValueChange={setProjectFilter}>
-                <SelectTrigger className="w-[180px] h-8 bg-white border-slate-200 text-[13px]">
-                    <SelectValue placeholder="All Projects" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Projects</SelectItem>
-                    {projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}
-                </SelectContent>
-             </Select>
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className="flex items-center">
+              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span className="text-sm font-medium">Filters:</span>
+            </div>
+            <Select value={projectFilter} onValueChange={setProjectFilter}>
+              <SelectTrigger className="h-8 w-[180px] bg-white border-slate-200 text-[13px]">
+                <SelectValue placeholder="All Projects" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Projects</SelectItem>
+                {projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Badge variant="outline" className="bg-white px-3 py-1 text-slate-500 font-normal border-slate-200 h-8">
+              User: <span className="font-semibold ml-1 text-indigo-700">{user?.name}</span>
+            </Badge>
+            { (projectFilter !== "all" || searchTerm) && (
+              <Button variant="ghost" size="sm" onClick={() => {setProjectFilter("all"); setSearchTerm("");}} className="h-8">
+                <X className="h-4 w-4 mr-1" /> Clear
+              </Button>
+            )}
           </div>
 
-          {/* Table */}
           <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
             <Table>
               <TableHeader className="bg-slate-50">
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-[120px] text-xs font-bold uppercase text-slate-500">Date</TableHead>
-                  <TableHead className="text-xs font-bold uppercase text-slate-500">Project & Milestone</TableHead>
-                  <TableHead className="text-xs font-bold uppercase text-slate-500">Task</TableHead>
+                  <TableHead className="text-xs font-bold uppercase text-slate-500">Project Info</TableHead>
+                  <TableHead className="text-xs font-bold uppercase text-slate-500">Work Item</TableHead>
                   <TableHead className="text-xs font-bold uppercase text-slate-500">Description</TableHead>
                   <TableHead className="w-[100px] text-xs font-bold uppercase text-slate-500 text-center">Hours</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tableData.map((ts) => (
+                {tableData.length === 0 ? (
+                  <TableRow><TableCell colSpan={6} className="text-center py-10 text-slate-400">No entries found.</TableCell></TableRow>
+                ) : (
+                tableData.map((ts) => (
                   <TableRow key={ts._id} className="group border-slate-100">
                     <TableCell className="text-[13px] font-medium text-slate-700">
                         {new Date(ts.date).toLocaleDateString()}
                     </TableCell>
                     <TableCell>
                         <div className="flex flex-col">
-                            <span className="text-[13px] font-semibold text-sky-700">{ts.projectId?.name}</span>
-                            <span className="text-[11px] text-slate-400">{ts.milestoneId?.name || "No Milestone"}</span>
+                            <span className="text-[13px] font-semibold text-sky-700">{ts.projectId?.name || "N/A"}</span>
+                            <span className="text-[11px] text-slate-400">{ts.milestoneId?.name || "General"}</span>
                         </div>
                     </TableCell>
                     <TableCell>
-                        <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal text-[11px]">
-                            {ts.taskId?.title || "General Work"}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal text-[11px] w-fit">
+                              {ts.taskId?.title || "Direct Work"}
+                          </Badge>
+                          {ts.subTaskId && (
+                             <span className="text-[10px] text-indigo-500 font-medium ml-1">↳ {ts.subTaskId?.title}</span>
+                          )}
+                        </div>
                     </TableCell>
                     <TableCell className="text-[13px] text-slate-600 italic max-w-[300px] truncate">
                         {ts.description}
@@ -275,20 +354,20 @@ export default function TimesheetPage() {
                           <DropdownMenuItem onClick={() => handleEdit(ts)} className="text-slate-600 cursor-pointer">
                             <Pencil className="mr-2 h-4 w-4"/> Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600 cursor-pointer">
+                          <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer">
                             <Trash className="mr-2 h-4 w-4"/> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
+                )))}
               </TableBody>
             </Table>
           </div>
         </div>
 
-        {/* Detailed Modal - FIX: Added sizing constraints */}
+        {/* Dialog for entry */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-xl">
             <DialogHeader className="bg-indigo-900 p-6 text-white sticky top-0 z-10">
@@ -312,7 +391,7 @@ export default function TimesheetPage() {
 
               <div className="space-y-1.5">
                 <Label className="text-[11px] uppercase font-bold text-slate-400">Project</Label>
-                <Select value={formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, projectId: val, milestoneId: "", taskId: ""}))}>
+                <Select value={formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, projectId: val, milestoneId: "", taskId: "", subTaskId: ""}))}>
                   <SelectTrigger className="h-9 text-[13px] border-slate-200">
                     <SelectValue placeholder="Select Project" />
                   </SelectTrigger>
@@ -325,7 +404,7 @@ export default function TimesheetPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-[11px] uppercase font-bold text-slate-400">Milestone</Label>
-                  <Select value={formData.milestoneId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, milestoneId: val, taskId: ""}))}>
+                  <Select value={formData.milestoneId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, milestoneId: val, taskId: "", subTaskId: ""}))}>
                     <SelectTrigger className="h-9 text-[13px] border-slate-200">
                       <SelectValue placeholder="Select Milestone" />
                     </SelectTrigger>
@@ -336,7 +415,7 @@ export default function TimesheetPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-[11px] uppercase font-bold text-slate-400">Task</Label>
-                  <Select value={formData.taskId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, taskId: val}))}>
+                  <Select value={formData.taskId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({...prev, taskId: val, subTaskId: ""}))}>
                     <SelectTrigger className="h-9 text-[13px] border-slate-200">
                       <SelectValue placeholder="Select Task" />
                     </SelectTrigger>
@@ -345,6 +424,22 @@ export default function TimesheetPage() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[11px] uppercase font-bold text-slate-400">Subtask (Optional)</Label>
+                <Select value={formData.subTaskId} disabled={!formData.taskId} onValueChange={(val) => setFormData(prev => ({...prev, subTaskId: val}))}>
+                  <SelectTrigger className="h-9 text-[13px] border-slate-200">
+                    <SelectValue placeholder="Select Subtask" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subtasks.length > 0 ? (
+                        subtasks.map(s => <SelectItem key={s._id} value={s._id}>{s.title}</SelectItem>)
+                    ) : (
+                        <SelectItem value="none" disabled>No subtasks found</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1.5">
