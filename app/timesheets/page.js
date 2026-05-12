@@ -242,154 +242,150 @@ export default function TimesheetPage() {
 
   return (
     // <ProtectedRoute requiredPermission="view_timesheets">
-      <DashboardShell>
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">Timesheets</h1>
-              <p className="text-muted-foreground">Manage your work logs and track billable hours.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search logs..."
-                  className="pl-8 w-full sm:w-[250px] bg-white text-[13px]"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={exportToCSV} disabled={tableData.length === 0} className="text-[13px]">
-                  <FileText className="mr-2 h-4 w-4" /> Export
-                </Button>
-                {/* CHANGED: Primary color to Indigo to match Task Page style */}
-                <Button onClick={handleOpenNew}>
-                  <Plus className="mr-2 h-4 w-4" /> Log Time
-                </Button>
-              </div>
-            </div>
+    <DashboardShell>
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Timesheets</h1>
+            <p className="text-muted-foreground">Manage your work logs and track billable hours.</p>
           </div>
-
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex items-center">
-              <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="text-sm font-medium">Filters:</span>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search logs..."
+                className="pl-8 w-full sm:w-[250px] bg-white text-[13px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <Select value={projectFilter} onValueChange={setProjectFilter}>
-              <SelectTrigger className="h-8 w-[180px] bg-white border-slate-200 text-[13px]">
-                <SelectValue placeholder="All Projects" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Projects</SelectItem>
-                {projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Badge variant="outline" className="bg-white px-3 py-1 text-slate-500 font-normal border-slate-200 h-8">
-              User: <span className="font-semibold ml-1 text-indigo-700">{user?.name}</span>
-            </Badge>
-            {(projectFilter !== "all" || searchTerm) && (
-              <Button variant="ghost" size="sm" onClick={() => { setProjectFilter("all"); setSearchTerm(""); }} className="h-8">
-                <X className="h-4 w-4 mr-1" /> Clear
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={exportToCSV} disabled={tableData.length === 0} className="text-[13px]">
+                <FileText className="mr-2 h-4 w-4" /> Export
               </Button>
-            )}
-          </div>
-
-          <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader className="bg-slate-50">
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[120px] text-xs font-bold uppercase text-slate-500">Date</TableHead>
-                  <TableHead className="text-xs font-bold uppercase text-slate-500">Project Info</TableHead>
-                  <TableHead className="text-xs font-bold uppercase text-slate-500">Work Item</TableHead>
-                  <TableHead className="text-xs font-bold uppercase text-slate-500">Description</TableHead>
-                  <TableHead className="w-[100px] text-xs font-bold uppercase text-slate-500 text-center">Hours</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tableData.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-10 text-slate-400">No entries found.</TableCell></TableRow>
-                ) : (
-                  tableData.map((ts) => (
-                    <TableRow key={ts._id} className="group border-slate-100">
-                      <TableCell className="text-[13px] font-medium text-slate-700">
-                        {new Date(ts.date).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          {/* Changed link color to indigo to match task style */}
-                          <span className="text-[13px] font-semibold text-indigo-700">{ts.projectId?.name || "N/A"}</span>
-                          <span className="text-[11px] text-slate-400">{ts.milestoneId?.name || "General"}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal text-[11px] w-fit">
-                            {ts.taskId?.title || "Direct Work"}
-                          </Badge>
-                          {ts.subTaskId && (
-                            <span className="text-[10px] text-indigo-500 font-medium ml-1">↳ {ts.subTaskId?.title}</span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-[13px] text-slate-600 italic max-w-[300px] truncate">
-                        {ts.description}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 font-semibold">{ts.hours}h</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[140px]">
-                            <DropdownMenuItem onClick={() => handleEdit(ts)} className="text-slate-600 cursor-pointer">
-                              <Pencil className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer">
-                              <Trash className="mr-2 h-4 w-4" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  )))}
-              </TableBody>
-            </Table>
+              {/* CHANGED: Primary color to Indigo to match Task Page style */}
+              <Button onClick={handleOpenNew}>
+                <Plus className="mr-2 h-4 w-4" /> Log Time
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Dialog for entry */}
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-xl">
-            {/* CHANGED: Header background to a dark slate/indigo for higher contrast */}
-            <DialogHeader className=" p-3 text-slate-900 ">
-              <DialogTitle className="text-xl flex items-center gap-2">
-                <Clock className="w-5 h-5 " /> {editingId ? "Edit Time Entry" : "Log New Time"}
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex items-center">
+            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+            <span className="text-sm font-medium">Filters:</span>
+          </div>
+          <Select value={projectFilter} onValueChange={setProjectFilter}>
+            <SelectTrigger className="h-8 w-[180px] bg-white border-slate-200 text-[13px]">
+              <SelectValue placeholder="All Projects" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Projects</SelectItem>
+              {projects.map(p => <SelectItem key={p._id} value={p._id}>{p.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Badge variant="outline" className="bg-white px-3 py-1 text-slate-500 font-normal border-slate-200 h-8">
+            User: <span className="font-semibold ml-1 text-indigo-700">{user?.name}</span>
+          </Badge>
+          {(projectFilter !== "all" || searchTerm) && (
+            <Button variant="ghost" size="sm" onClick={() => { setProjectFilter("all"); setSearchTerm(""); }} className="h-8">
+              <X className="h-4 w-4 mr-1" /> Clear
+            </Button>
+          )}
+        </div>
+
+        <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader className="bg-slate-50">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[120px] text-xs font-bold uppercase text-slate-500">Date</TableHead>
+                <TableHead className="text-xs font-bold uppercase text-slate-500">Project Info</TableHead>
+                <TableHead className="text-xs font-bold uppercase text-slate-500">Work Item</TableHead>
+                <TableHead className="text-xs font-bold uppercase text-slate-500">Description</TableHead>
+                <TableHead className="w-[100px] text-xs font-bold uppercase text-slate-500 text-center">Hours</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tableData.length === 0 ? (
+                <TableRow><TableCell colSpan={6} className="text-center py-10 text-slate-400">No entries found.</TableCell></TableRow>
+              ) : (
+                tableData.map((ts) => (
+                  <TableRow key={ts._id} className="group border-slate-100">
+                    <TableCell className="text-[13px] font-medium text-slate-700">
+                      {new Date(ts.date).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        {/* Changed link color to indigo to match task style */}
+                        <span className="text-[13px] font-semibold text-indigo-700">{ts.projectId?.name || "N/A"}</span>
+                        <span className="text-[11px] text-slate-400">{ts.milestoneId?.name || "General"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="secondary" className="bg-slate-100 text-slate-700 font-normal text-[11px] w-fit">
+                          {ts.taskId?.title || "Direct Work"}
+                        </Badge>
+                        {ts.subTaskId && (
+                          <span className="text-[10px] text-indigo-500 font-medium ml-1">↳ {ts.subTaskId?.title}</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-[13px] text-slate-600 italic max-w-[300px] truncate">
+                      {ts.description}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge className="bg-indigo-50 text-indigo-700 border-indigo-100 font-semibold">{ts.hours}h</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[140px]">
+                          <DropdownMenuItem onClick={() => handleEdit(ts)} className="text-slate-600 cursor-pointer">
+                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer">
+                            <Trash className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                )))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* Dialog for entry */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[520px] p-0 border-none shadow-2xl rounded-xl overflow-hidden">
+
+          {/* Clean, Simple Header */}
+          <DialogHeader className="px-5 py-3 border-b bg-white">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-600" />
+              <DialogTitle className="text-base font-bold text-slate-900">
+                {editingId ? "Edit Time Entry" : "Log New Time"}
               </DialogTitle>
-              <p className="text-slate-400 text-xs mt-1">Fill in the details for your work activity.</p>
-            </DialogHeader>
+            </div>
+          </DialogHeader>
 
-            <div className="p-6 grid gap-5 bg-white">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase font-bold text-slate-400">Date</Label>
-                  <Input type="date" name="date" className="h-9 text-[13px] border-slate-200" value={formData.date} onChange={handleInputChange} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase font-bold text-slate-400">Hours Worked</Label>
-                  <Input type="number" name="hours" placeholder="0.0" className="h-9 text-[13px] border-slate-200" value={formData.hours} onChange={handleInputChange} />
-                </div>
-              </div>
+          {/* Body: No Scroll, Multi-column rows */}
+          <div className="p-5 grid gap-4 bg-white">
 
-              <div className="space-y-1.5">
-                <Label className="text-[11px] uppercase font-bold text-slate-400">Project</Label>
+            {/* Line 1: Project and Milestone */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Project</Label>
                 <Select value={formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, projectId: val, milestoneId: "", taskId: "", subTaskId: "" }))}>
-                  <SelectTrigger className="h-9 text-[13px] border-slate-200">
+                  <SelectTrigger className="h-9 text-[13px] border-slate-200 focus:ring-1 focus:ring-indigo-500">
                     <SelectValue placeholder="Select Project" />
                   </SelectTrigger>
                   <SelectContent>
@@ -397,37 +393,37 @@ export default function TimesheetPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase font-bold text-slate-400">Milestone</Label>
-                  <Select value={formData.milestoneId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, milestoneId: val, taskId: "", subTaskId: "" }))}>
-                    <SelectTrigger className="h-9 text-[13px] border-slate-200">
-                      <SelectValue placeholder="Select Milestone" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredMilestones.map(m => <SelectItem key={m._id} value={m._id}>{m.name}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase font-bold text-slate-400">Task</Label>
-                  <Select value={formData.taskId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, taskId: val, subTaskId: "" }))}>
-                    <SelectTrigger className="h-9 text-[13px] border-slate-200">
-                      <SelectValue placeholder="Select Task" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredTasks.map(t => <SelectItem key={t._id} value={t._id}>{t.title}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Milestone</Label>
+                <Select value={formData.milestoneId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, milestoneId: val, taskId: "", subTaskId: "" }))}>
+                  <SelectTrigger className="h-9 text-[13px] border-slate-200 focus:ring-1 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredMilestones.map(m => <SelectItem key={m._id} value={m._id}>{m.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
+            </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-[11px] uppercase font-bold text-slate-400">Subtask (Optional)</Label>
+            {/* Line 2: Task and Subtask */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Task</Label>
+                <Select value={formData.taskId} disabled={!formData.projectId} onValueChange={(val) => setFormData(prev => ({ ...prev, taskId: val, subTaskId: "" }))}>
+                  <SelectTrigger className="h-9 text-[13px] border-slate-200 focus:ring-1 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select Task" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredTasks.map(t => <SelectItem key={t._id} value={t._id}>{t.title}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Subtask (Optional)</Label>
                 <Select value={formData.subTaskId} disabled={!formData.taskId} onValueChange={(val) => setFormData(prev => ({ ...prev, subTaskId: val }))}>
-                  <SelectTrigger className="h-9 text-[13px] border-slate-200">
-                    <SelectValue placeholder="Select Subtask" />
+                  <SelectTrigger className="h-9 text-[13px] border-slate-200 focus:ring-1 focus:ring-indigo-500">
+                    <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
                     {subtasks.length > 0 ? (
@@ -438,29 +434,47 @@ export default function TimesheetPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
-              <div className="space-y-1.5">
-                <Label className="text-[11px] uppercase font-bold text-slate-400">Work Description</Label>
-                <Textarea
-                  name="description"
-                  placeholder="Describe your progress..."
-                  className="text-[13px] min-h-[100px] resize-none border-slate-200"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                />
+            {/* Line 3: Date and Hours */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Date</Label>
+                <Input type="date" name="date" className="h-9 text-[13px] border-slate-200 focus:ring-1 focus:ring-indigo-500" value={formData.date} onChange={handleInputChange} />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Hours Worked</Label>
+                <Input type="number" name="hours" placeholder="0.0" className="h-9 text-[13px] border-slate-200 focus:ring-1 focus:ring-indigo-500" value={formData.hours} onChange={handleInputChange} />
               </div>
             </div>
 
-            <DialogFooter className="bg-slate-50 p-4 border-t sticky bottom-0 z-10">
-              <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="text-[13px]">Cancel</Button>
-              {/* CHANGED: Button color to Indigo to match primary action style */}
-              <Button onClick={handleSave} disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} {editingId ? "Update Entry" : "Save Entry"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </DashboardShell>
+            {/* Line 4: Description */}
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase font-bold text-slate-400 ml-0.5">Description</Label>
+              <Textarea
+                name="description"
+                placeholder="Briefly describe your progress..."
+                className="text-[13px] min-h-[70px] max-h-[90px] resize-none border-slate-200 p-2.5 focus:ring-1 focus:ring-indigo-500"
+                value={formData.description}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+
+          {/* Footer */}
+          <DialogFooter className="px-5 py-3 border-t bg-slate-50/50 flex flex-row items-center justify-end gap-2">
+            <Button variant="ghost" onClick={() => setIsDialogOpen(false)} className="h-8 text-[12px] px-3 font-medium text-slate-600">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={loading} className="h-8 text-[12px] px-4 bg-slate-900 hover:bg-slate-800 text-white transition-all font-medium">
+              {loading && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+              {editingId ? "Update Entry" : "Save Entry"}
+            </Button>
+          </DialogFooter>
+
+        </DialogContent>
+      </Dialog>
+    </DashboardShell>
     // </ProtectedRoute>
   );
 }
