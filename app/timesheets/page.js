@@ -241,7 +241,7 @@ export default function TimesheetPage() {
   };
 
   return (
-    <ProtectedRoute requiredPermission="view_timesheets">
+    // <ProtectedRoute requiredPermission="view_timesheets">
       <DashboardShell>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -461,6 +461,6 @@ export default function TimesheetPage() {
           </DialogContent>
         </Dialog>
       </DashboardShell>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 }

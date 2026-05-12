@@ -6,40 +6,132 @@ import {
   BarChart3, 
   ChevronRight, 
   Search, 
-  Briefcase, 
   FolderRoot, 
-  ArrowLeft 
+  ArrowLeft,
+  Clock,
+  Share2,
+  FileText,
+  Table as TableIcon
 } from 'lucide-react';
 import api from '@/config/api';
 import { DashboardShell } from '@/components/dashboard-shell';
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
+// --- FIXED IMPORTS ---
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable'; 
+import * as XLSX from 'xlsx';
+
 export default function ReportsListPage() {
     const [projects, setProjects] = useState([]);
+    const [users, setUsers] = useState([]); 
+    const [timesheetData, setTimesheetData] = useState([]);
     const [filteredProjects, setFilteredProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-    const [showProjectList, setShowProjectList] = useState(false); // Controls the click-to-list logic
+    const [view, setView] = useState("categories");
 
-    // Initial Data Fetch
-    useEffect(() => {
-        const loadResponse = async () => {
+    const [filters, setFilters] = useState({
+        fromDate: "",
+        toDate: "",
+        projectId: "all",
+        userId: "all"
+    });
+
+    // --- FIXED PDF EXPORT LOGIC ---
+    const exportToPDF = () => {
+        try {
+            const doc = new jsPDF();
+            
+            // Header for the PDF
+            doc.setFontSize(18);
+            doc.text("Timesheet Report", 14, 15);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
+
+            const tableColumn = ["User", "Project", "Date", "Hours", "Status"];
+            const tableRows = timesheetData.map(ts => [
+                ts.userName || "N/A",
+                ts.projectName || "N/A",
+                ts.date ? new Date(ts.date).toLocaleDateString() : "N/A",
+                `${ts.hours || 0}h`,
+                ts.status || "N/A"
+            ]);
+
+            // Use the imported autoTable function directly instead of doc.autoTable
+            autoTable(doc, {
+                head: [tableColumn],
+                body: tableRows,
+                startY: 30,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 145, 255] },
+                styles: { fontSize: 9, cellPadding: 3 },
+                alternateRowStyles: { fillColor: [245, 247, 249] }
+            });
+
+            doc.save(`Timesheet_Report_${new Date().getTime()}.pdf`);
+        } catch (error) {
+            console.error("PDF Generation Error:", error);
+            alert("Failed to generate PDF. Check console for details.");
+        }
+    };
+
+    const exportToExcel = () => {
+        const worksheet = XLSX.utils.json_to_sheet(timesheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Timesheets");
+        XLSX.writeFile(workbook, `Timesheet_Report_${new Date().getTime()}.xlsx`);
+    };
+
+    const handleShare = async () => {
+        if (navigator.share) {
             try {
-                const response = await api.get("project");
-                const data = response.data.project || [];
-                setProjects(data);
-                setFilteredProjects(data);
-                setLoading(false);
+                await navigator.share({
+                    title: 'Timesheet Report',
+                    text: `Shared Timesheet Report entries: ${timesheetData.length}`,
+                    url: window.location.href
+                });
+            } catch (err) { console.error(err); }
+        } else {
+            alert("Web Share API not supported in this browser.");
+        }
+    };
+
+    useEffect(() => {
+        const loadInitialData = async () => {
+            try {
+                const [projRes, userRes] = await Promise.all([
+                    api.get("project"),
+                    api.get("users") 
+                ]);
+                const projData = projRes.data.project || [];
+                setProjects(projData);
+                setFilteredProjects(projData);
+                setUsers(userRes.data.users || []);
             } catch (err) {
-                console.error("Failed to fetch projects:", err);
+                console.error("Data fetch error:", err);
+            } finally {
                 setLoading(false);
             }
         };
-        loadResponse();
+        loadInitialData();
     }, []);
 
-    // Search Logic (Matching your Project Page logic)
+    const getTimesheetReport = async () => {
+        setLoading(true);
+        try {
+            const query = new URLSearchParams(filters).toString();
+            const response = await api.get(`report/timesheets?${query}`);
+            setTimesheetData(response.data.data || []);
+        } catch (err) {
+            console.error("Report fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         const result = projects.filter((project) =>
             project.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,7 +141,7 @@ export default function ReportsListPage() {
         setFilteredProjects(result);
     }, [searchTerm, projects]);
 
-    if (loading) {
+    if (loading && view === "categories") {
         return (
             <div className="flex h-screen items-center justify-center bg-[#f4f7f9]">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0091ff] border-t-transparent"></div>
@@ -60,7 +152,6 @@ export default function ReportsListPage() {
     return (
         <DashboardShell>
             <div className="min-h-screen bg-[#f4f7f9] text-[13px]">
-                {/* Header Section */}
                 <div className="flex items-center justify-between border-b bg-white px-8 py-4">
                     <div className="flex items-center gap-3">
                         <BarChart3 className="text-[#0091ff]" size={24} />
@@ -69,99 +160,161 @@ export default function ReportsListPage() {
                 </div>
 
                 <div className="mx-auto max-w-6xl p-8">
-                    {!showProjectList ? (
-                        /* STEP 1: The Initial Project Module Card */
+                    {view === "categories" ? (
                         <div className="flex flex-col gap-6">
                             <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Select Category</h2>
-                            <div 
-                                onClick={() => setShowProjectList(true)}
-                                className="group flex w-full max-w-md cursor-pointer items-center gap-5 rounded-lg border border-[#e3e9ef] bg-white p-8 shadow-sm transition-all hover:border-[#0091ff] hover:shadow-md"
-                            >
-                                <div className="rounded-xl bg-[#f0f7ff] p-5 text-[#0091ff] group-hover:bg-[#0091ff] group-hover:text-white transition-all">
-                                    <FolderRoot size={40} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div onClick={() => setView("project_list")} className="group flex cursor-pointer items-center gap-5 rounded-lg border border-[#e3e9ef] bg-white p-8 shadow-sm transition-all hover:border-[#0091ff] hover:shadow-md">
+                                    <div className="rounded-xl bg-[#f0f7ff] p-5 text-[#0091ff] group-hover:bg-[#0091ff] group-hover:text-white transition-all">
+                                        <FolderRoot size={40} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-800">Projects</h3>
+                                        <p className="text-slate-500 italic">View reports for {projects.length} projects</p>
+                                    </div>
+                                    <ChevronRight className="ml-auto text-slate-300" />
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-bold text-slate-800">Projects</h3>
-                                    <p className="text-slate-500 italic">View and export reports for {projects.length} projects</p>
+
+                                <div onClick={() => { setView("timesheet_report"); getTimesheetReport(); }} className="group flex cursor-pointer items-center gap-5 rounded-lg border border-[#e3e9ef] bg-white p-8 shadow-sm transition-all hover:border-[#0091ff] hover:shadow-md">
+                                    <div className="rounded-xl bg-[#fff7f0] p-5 text-[#ff9100] group-hover:bg-[#ff9100] group-hover:text-white transition-all">
+                                        <Clock size={40} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-800">Timesheets</h3>
+                                        <p className="text-slate-500 italic">User logs and team hour analysis</p>
+                                    </div>
+                                    <ChevronRight className="ml-auto text-slate-300" />
                                 </div>
-                                <ChevronRight className="ml-auto text-slate-300" />
                             </div>
                         </div>
-                    ) : (
-                        /* STEP 2: The Searchable Project List */
+                    ) : view === "project_list" ? (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            {/* Toolbar */}
                             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <button 
-                                    onClick={() => setShowProjectList(false)}
-                                    className="flex items-center gap-2 font-bold text-[#0091ff] hover:underline"
-                                >
-                                    <ArrowLeft size={16} /> Back to Modules
+                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-[#0091ff] hover:underline">
+                                    <ArrowLeft size={16} /> Back
                                 </button>
-                                
                                 <div className="relative w-full md:w-[350px]">
                                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                                     <Input 
                                         type="text" 
-                                        placeholder="Search project name, ID, or client..." 
+                                        placeholder="Search projects..." 
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="bg-white pl-10 h-10 border-[#e3e9ef] focus:ring-[#0091ff]"
+                                        className="bg-white pl-10 border-[#e3e9ef]"
                                     />
                                 </div>
                             </div>
 
-                            {/* Project Table (High Density / Professional) */}
-                            <div className="overflow-hidden rounded-lg border border-[#e3e9ef] bg-white shadow-sm">
-                                <table className="w-full border-collapse text-left">
+                            <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+                                <table className="w-full text-left">
                                     <thead className="bg-[#f9fbff] text-[11px] font-bold uppercase text-slate-500 border-b">
                                         <tr>
-                                            <th className="px-6 py-4">Project Information</th>
-                                            <th className="px-6 py-4">Client Name</th>
+                                            <th className="px-6 py-4">Project</th>
+                                            <th className="px-6 py-4">Client</th>
                                             <th className="px-6 py-4 text-center">Status</th>
                                             <th className="px-6 py-4 text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
-                                        {filteredProjects.length > 0 ? (
-                                            filteredProjects.map((project) => (
-                                                <tr key={project._id} className="group hover:bg-[#fcfdfe] transition-colors">
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="rounded bg-slate-50 p-2 text-slate-400 group-hover:bg-[#f0f7ff] group-hover:text-[#0091ff]">
-                                                                <Briefcase size={18} />
-                                                            </div>
-                                                            <div>
-                                                                <div className="font-bold text-slate-800">{project.name}</div>
-                                                                <div className="text-[11px] text-slate-400 uppercase tracking-tighter">
-                                                                    {project.projectId || project.projectCode}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-slate-600 font-medium">
-                                                        {project.clientName || project.client || "No Client"}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center">
-                                                        <Badge variant={project.active ? "success" : "secondary"} className="text-[10px] font-bold py-0 h-5">
-                                                            {project.active ? "ACTIVE" : "INACTIVE"}
-                                                        </Badge>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <Link href={`/reports/${project._id}`}>
-                                                            <button className="rounded border border-[#0091ff] px-4 py-1.5 text-[11px] font-bold text-[#0091ff] hover:bg-[#0091ff] hover:text-white transition-all shadow-sm">
-                                                                Generate Report
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={4} className="py-20 text-center text-slate-400 italic">
-                                                    No projects found matching "{searchTerm}"
+                                        {filteredProjects.map((project) => (
+                                            <tr key={project._id} className="hover:bg-[#fcfdfe]">
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold">{project.name}</div>
+                                                    <div className="text-[11px] text-slate-400">{project.projectId}</div>
+                                                </td>
+                                                <td className="px-6 py-4">{project.clientName}</td>
+                                                <td className="px-6 py-4 text-center">
+                                                    <Badge variant={project.active ? "default" : "secondary"}>
+                                                        {project.active ? "ACTIVE" : "INACTIVE"}
+                                                    </Badge>
+                                                </td>
+                                                <td className="px-6 py-4 text-right">
+                                                    <Link href={`/reports/${project._id}`}>
+                                                        <button className="rounded border border-[#0091ff] px-4 py-1.5 text-[11px] font-bold text-[#0091ff] hover:bg-[#0091ff] hover:text-white transition-all">
+                                                            View
+                                                        </button>
+                                                    </Link>
                                                 </td>
                                             </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            <div className="flex items-center justify-between mb-6">
+                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-[#0091ff] hover:underline">
+                                    <ArrowLeft size={16} /> Back
+                                </button>
+
+                                {timesheetData.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <button onClick={exportToPDF} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-red-100 text-red-600 rounded font-bold hover:bg-red-50">
+                                            <FileText size={14} /> PDF
+                                        </button>
+                                        <button onClick={exportToExcel} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-green-100 text-green-600 rounded font-bold hover:bg-green-50">
+                                            <TableIcon size={14} /> Excel
+                                        </button>
+                                        <button onClick={handleShare} className="flex items-center gap-2 px-3 py-1.5 bg-[#0091ff] text-white rounded font-bold hover:bg-[#007ad6]">
+                                            <Share2 size={14} /> Share
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4 rounded-lg border bg-white p-4 items-end">
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">From</label>
+                                    <Input type="date" value={filters.fromDate} onChange={(e) => setFilters({...filters, fromDate: e.target.value})} className="h-9" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">To</label>
+                                    <Input type="date" value={filters.toDate} onChange={(e) => setFilters({...filters, toDate: e.target.value})} className="h-9" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Project</label>
+                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.projectId} onChange={(e) => setFilters({...filters, projectId: e.target.value})}>
+                                        <option value="all">All Projects</option>
+                                        {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Member</label>
+                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.userId} onChange={(e) => setFilters({...filters, userId: e.target.value})}>
+                                        <option value="all">All Members</option>
+                                        {users.map(u => <option key={u._id} value={u._id}>{u.name}({u.role})</option>)}
+                                    </select>
+                                </div>
+                                <button onClick={getTimesheetReport} className="h-9 rounded bg-[#0091ff] font-bold text-white hover:bg-[#007ad6]">
+                                    Filter
+                                </button>
+                            </div>
+
+                            <div className="overflow-hidden rounded-lg border bg-white">
+                                <table className="w-full text-left">
+                                    <thead className="bg-[#f9fbff] text-[11px] font-bold uppercase border-b">
+                                        <tr>
+                                            <th className="px-6 py-4">Member</th>
+                                            <th className="px-6 py-4">Project</th>
+                                            <th className="px-6 py-4 text-center">Date</th>
+                                            <th className="px-6 py-4 text-center">Hours</th>
+                                            <th className="px-6 py-4">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                        {timesheetData.length > 0 ? timesheetData.map((ts, idx) => (
+                                            <tr key={idx} className="hover:bg-[#fcfdfe]">
+                                                <td className="px-6 py-4 font-bold">{ts.userName}</td>
+                                                <td className="px-6 py-4 text-slate-600">{ts.projectName}</td>
+                                                <td className="px-6 py-4 text-center">{new Date(ts.date).toLocaleDateString()}</td>
+                                                <td className="px-6 py-4 text-center text-[#0091ff] font-bold">{ts.hours}h</td>
+                                                <td className="px-6 py-4">
+                                                    <Badge variant={ts.status === 'Approved' ? 'default' : 'outline'}>{ts.status}</Badge>
+                                                </td>
+                                            </tr>
+                                        )) : (
+                                            <tr><td colSpan={5} className="py-20 text-center text-slate-400">No records found.</td></tr>
                                         )}
                                     </tbody>
                                 </table>
