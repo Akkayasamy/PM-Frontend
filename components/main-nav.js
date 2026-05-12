@@ -20,6 +20,8 @@ import {
   User,
   Building,
   Timer,
+  FileText,
+  CalendarClock 
 } from "lucide-react";
 
 export function MainNav({ closeSidebar }) {
@@ -37,10 +39,16 @@ export function MainNav({ closeSidebar }) {
       icon: LayoutDashboard,
       permission: null, // Everyone can access
     },
-       {
+    {
       title: "reports",
       href: "/reports",
-      icon: Settings,
+      icon: FileText,
+      permission: null,
+    },
+    {
+      title: "timesheets",
+      href: "/timesheets",
+      icon: CalendarClock ,
       permission: null,
     },
     {
