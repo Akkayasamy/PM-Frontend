@@ -11,7 +11,8 @@ import {
     Clock,
     Share2,
     FileText,
-    Table as TableIcon
+    Table as TableIcon,
+    RotateCcw
 } from 'lucide-react';
 import api from '@/config/api';
 import { DashboardShell } from '@/components/dashboard-shell';
@@ -39,6 +40,28 @@ export default function ReportsListPage() {
         userId: "all",
         period: "custom"
     });
+
+    const resetFilters = async () => {
+        const defaultFilters = {
+            fromDate: "",
+            toDate: "",
+            projectId: "all",
+            userId: "all",
+            period: "custom"
+        };
+        setFilters(defaultFilters);
+        
+        setLoading(true);
+        try {
+            const query = new URLSearchParams(defaultFilters).toString();
+            const response = await api.get(`report/timesheets?${query}`);
+            setTimesheetData(response.data.data || []);
+        } catch (err) {
+            console.error("Report fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handlePeriodChange = (period) => {
         const today = new Date();
@@ -214,7 +237,7 @@ export default function ReportsListPage() {
                     ) : view === "project_list" ? (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-primary hover:underline">
+                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-primary hover:underline text-[13px]">
                                     <ArrowLeft size={16} /> Back
                                 </button>
                                 <div className="relative w-full md:w-[350px]">
@@ -223,7 +246,7 @@ export default function ReportsListPage() {
                                         placeholder="Search projects..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="pl-10 bg-card border-border h-9"
+                                        className="pl-10 bg-card border-border h-9 text-[13px]"
                                     />
                                 </div>
                             </div>
@@ -268,7 +291,7 @@ export default function ReportsListPage() {
                         /* Timesheet Report View */
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex items-center justify-between mb-6">
-                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-primary hover:underline">
+                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-primary hover:underline text-[13px]">
                                     <ArrowLeft size={16} /> Back
                                 </button>
 
@@ -293,81 +316,92 @@ export default function ReportsListPage() {
                                 )}
                             </div>
 
-                            {/* Filters Bar */}
-                            <div className="mb-6 grid grid-cols-1 md:grid-cols-6 gap-4 rounded-lg border border-border bg-card p-4 items-end shadow-sm">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Period</label>
-                                    <select
-                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] focus:ring-1 focus:ring-primary outline-none"
-                                        value={filters.period}
-                                        onChange={(e) => handlePeriodChange(e.target.value)}
-                                    >
-                                        <option value="custom">Custom Range</option>
-                                        <option value="weekly">Last 7 Days</option>
-                                        <option value="monthly">Last 30 Days</option>
-                                        <option value="yearly">Last Year</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">From</label>
-                                    <Input
-                                        type="date"
-                                        disabled={filters.period !== "custom"}
-                                        value={filters.fromDate}
-                                        onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
-                                        className="h-9 text-[12px] bg-background"
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">To</label>
-                                    <Input
-                                        type="date"
-                                        disabled={filters.period !== "custom"}
-                                        value={filters.toDate}
-                                        onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
-                                        className="h-9 text-[12px] bg-background"
-                                    />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Project</label>
-                                    <select
-                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
-                                        value={filters.projectId}
-                                        onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}
-                                    >
-                                        <option value="all">All Projects</option>
-                                        {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
-                                    </select>
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Team</label>
-                                    <select
-                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
-                                        value={filters.userId}
-                                        onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
-                                    >
-                                        <option value="all">All Employees</option>
-                                        {users.map(u => (u?.role == "project_manager" || u?.role == "Team Leader") && (<option key={u._id} value={u._id}>{u.name}</option>))}
-                                    </select>
+                            {/* Filters Bar with Right-Aligned Actions */}
+                            <div className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase">Period</label>
+                                        <select
+                                            className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] focus:ring-1 focus:ring-primary outline-none"
+                                            value={filters.period}
+                                            onChange={(e) => handlePeriodChange(e.target.value)}
+                                        >
+                                            <option value="custom">Custom Range</option>
+                                            <option value="weekly">Last 7 Days</option>
+                                            <option value="monthly">Last 30 Days</option>
+                                            <option value="yearly">Last Year</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase">From</label>
+                                        <Input
+                                            type="date"
+                                            disabled={filters.period !== "custom"}
+                                            value={filters.fromDate}
+                                            onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
+                                            className="h-9 text-[12px] bg-background"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase">To</label>
+                                        <Input
+                                            type="date"
+                                            disabled={filters.period !== "custom"}
+                                            value={filters.toDate}
+                                            onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
+                                            className="h-9 text-[12px] bg-background"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase">Project</label>
+                                        <select
+                                            className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
+                                            value={filters.projectId}
+                                            onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}
+                                        >
+                                            <option value="all">All Projects</option>
+                                            {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase">Team</label>
+                                        <select
+                                            className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
+                                            value={filters.userId}
+                                            onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                                        >
+                                            <option value="all">All Employees</option>
+                                            {users.map(u => (u?.role == "project_manager" || u?.role == "Team Leader") && (<option key={u._id} value={u._id}>{u.name}</option>))}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee</label>
+                                        <select
+                                            className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
+                                            value={filters.userId}
+                                            onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                                        >
+                                            <option value="all">All Employees</option>
+                                            {users.map(u => u?.role === "team_member" && (<option key={u._id} value={u._id}>{u.name}</option>))}
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee</label>
-                                    <select
-                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
-                                        value={filters.userId}
-                                        onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                                {/* Action Buttons - Right Aligned with Auto-Refetch Clear */}
+                                <div className="mt-4 flex justify-end gap-2">
+                                    <button
+                                        onClick={resetFilters}
+                                        className="h-9 px-4 rounded-md border border-border bg-background text-[13px] font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground flex items-center gap-2"
                                     >
-                                        <option value="all">All Employees</option>
-                                        {users.map(u => u?.role === "team_member" && (<option key={u._id} value={u._id}>{u.name}</option>))}
-                                    </select>
+                                        <RotateCcw size={14} /> Clear
+                                    </button>
+                                    <button
+                                        onClick={getTimesheetReport}
+                                        className="h-9 px-6 rounded-md bg-primary text-[13px] font-bold text-white transition-all hover:opacity-90 active:scale-95"
+                                    >
+                                        Filter
+                                    </button>
                                 </div>
-                                <button
-                                    onClick={getTimesheetReport}
-                                    className="h-9 px-6 rounded-md border border-border bg-background text-[12px] font-bold text-foreground transition-all hover:bg-muted active:scale-95 dark:border-border dark:bg-background dark:text-white dark:hover:bg-muted"
-                                >
-                                    Filter
-                                </button>
                             </div>
 
                             <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
@@ -381,7 +415,7 @@ export default function ReportsListPage() {
                                             <th className="px-6 py-4 text-center">Hours</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-border">
+                                    <tbody className="divide-y divide-border text-[13px]">
                                         {timesheetData.length > 0 ? timesheetData.map((ts, idx) => (
                                             <tr key={idx} className="hover:bg-muted/30">
                                                 <td className="px-6 py-4 text-center text-muted-foreground">
