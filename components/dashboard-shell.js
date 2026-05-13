@@ -26,13 +26,20 @@ export function DashboardShell({ children }) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
       {/* Top navbar */}
-      <header className="sticky top-0 z-40 border-b bg-white dark:bg-gray-800 shadow-sm">
+      <header className="sticky top-0 z-40 border-b shadow-sm bg-[rgb(96,119,153)] text-white dark:border-slate-700">
         <div className="flex h-16 items-center justify-between px-4">
           <div className="flex items-center">
-            <Button variant="ghost" size="icon" className="md:hidden mr-2" onClick={() => setSidebarOpen(!sidebarOpen)}>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden mr-2 hover:bg-white/20 text-white"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
               {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <div className="font-semibold text-xl flex items-center">
+
+            <div className="font-semibold text-xl flex items-center text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -41,7 +48,7 @@ export function DashboardShell({ children }) {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-6 w-6 mr-2 text-primary"
+                className="h-6 w-6 mr-2 text-white"
               >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>

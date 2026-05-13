@@ -416,22 +416,21 @@ export default function DashboardPage() {
             <CardContent className="pt-6">
               <div className="space-y-4">
                 {managedProjects.length > 0 ? (
-                  managedProjects.slice(0, 3).map((project) => (
-                    <div key={project.id} className="space-y-2">
+                  managedProjects.slice(0, 3).map((project, i) => (
+                    <div key={i} className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">
                           {project.name}
                         </span>
                         <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            project.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : project.status === "in_progress"
+                          className={`text-xs px-2 py-1 rounded-full ${project.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : project.status === "in_progress"
                               ? "bg-blue-100 text-blue-800"
                               : project.status === "on_hold"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
                         >
                           {project.status
                             .replace("_", " ")
@@ -443,10 +442,10 @@ export default function DashboardPage() {
                           project.status === "completed"
                             ? 100
                             : project.status === "in_progress"
-                            ? 50
-                            : project.status === "on_hold"
-                            ? 30
-                            : 10
+                              ? 50
+                              : project.status === "on_hold"
+                                ? 30
+                                : 10
                         }
                         className="h-2"
                       />
@@ -484,9 +483,9 @@ export default function DashboardPage() {
                   teams
                     .filter((t) => managedProjectIds.includes(t.projectId))
                     .slice(0, 3)
-                    .map((team) => (
+                    .map((team, i) => (
                       <div
-                        key={team.id}
+                        key={i}
                         className="flex justify-between items-center"
                       >
                         <div>
@@ -575,12 +574,12 @@ export default function DashboardPage() {
                       <div className="text-sm font-medium">
                         {projectTasks.length > 0
                           ? Math.round(
-                              (projectTasks.filter(
-                                (t) => t.status === "completed"
-                              ).length /
-                                projectTasks.length) *
-                                100
-                            )
+                            (projectTasks.filter(
+                              (t) => t.status === "completed"
+                            ).length /
+                              projectTasks.length) *
+                            100
+                          )
                           : 0}
                         %
                       </div>
@@ -589,10 +588,10 @@ export default function DashboardPage() {
                       value={
                         projectTasks.length > 0
                           ? (projectTasks.filter(
-                              (t) => t.status === "completed"
-                            ).length /
-                              projectTasks.length) *
-                            100
+                            (t) => t.status === "completed"
+                          ).length /
+                            projectTasks.length) *
+                          100
                           : 0
                       }
                       className="h-2 mt-2"
@@ -633,22 +632,21 @@ export default function DashboardPage() {
             <CardContent className="pt-6">
               <div className="space-y-4">
                 {assignedTasks.length > 0 ? (
-                  assignedTasks.slice(0, 3).map((task) => (
-                    <div key={task.id} className="space-y-1">
+                  assignedTasks.slice(0, 3).map((task, i) => (
+                    <div key={i} className="space-y-1">
                       <div className="flex justify-between items-center">
                         <span className="text-sm font-medium">
                           {task.title}
                         </span>
                         <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            task.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : task.status === "in_progress"
+                          className={`text-xs px-2 py-1 rounded-full ${task.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : task.status === "in_progress"
                               ? "bg-blue-100 text-blue-800"
                               : task.status === "review"
-                              ? "bg-purple-100 text-purple-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
+                                ? "bg-purple-100 text-purple-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
                         >
                           {task.status
                             .replace("_", " ")
@@ -694,9 +692,9 @@ export default function DashboardPage() {
                     {assignedTasks
                       .filter((t) => t.status !== "completed")
                       .slice(0, 3)
-                      .map((task) => (
+                      .map((task,i) => (
                         <div
-                          key={task.id}
+                          key={i}
                           className="flex justify-between items-center"
                         >
                           <div>
@@ -711,15 +709,14 @@ export default function DashboardPage() {
                             </div>
                           </div>
                           <div
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              task.priority === "urgent"
-                                ? "bg-red-100 text-red-800"
-                                : task.priority === "high"
+                            className={`text-xs px-2 py-1 rounded-full ${task.priority === "urgent"
+                              ? "bg-red-100 text-red-800"
+                              : task.priority === "high"
                                 ? "bg-orange-100 text-orange-800"
                                 : task.priority === "medium"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
                           >
                             {task.priority.charAt(0).toUpperCase() +
                               task.priority.slice(1)}
@@ -801,12 +798,12 @@ export default function DashboardPage() {
                       <div className="text-sm font-medium">
                         {assignedTasks.length > 0
                           ? Math.round(
-                              (assignedTasks.filter(
-                                (t) => t.status === "completed"
-                              ).length /
-                                assignedTasks.length) *
-                                100
-                            )
+                            (assignedTasks.filter(
+                              (t) => t.status === "completed"
+                            ).length /
+                              assignedTasks.length) *
+                            100
+                          )
                           : 0}
                         %
                       </div>
@@ -815,10 +812,10 @@ export default function DashboardPage() {
                       value={
                         assignedTasks.length > 0
                           ? (assignedTasks.filter(
-                              (t) => t.status === "completed"
-                            ).length /
-                              assignedTasks.length) *
-                            100
+                            (t) => t.status === "completed"
+                          ).length /
+                            assignedTasks.length) *
+                          100
                           : 0
                       }
                       className="h-2 mt-2"
@@ -899,9 +896,9 @@ export default function DashboardPage() {
                   <CardContent>
                     {projects.length > 0 ? (
                       <div className="space-y-2">
-                        {projects.slice(0, 5).map((project) => (
+                        {projects.slice(0, 5).map((project, index) => (
                           <div
-                            key={project.id}
+                            key={index}
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-2">
@@ -909,15 +906,14 @@ export default function DashboardPage() {
                               <span>{project.name}</span>
                             </div>
                             <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                project.status === "completed"
-                                  ? "bg-green-100 text-green-800"
-                                  : project.status === "in_progress"
+                              className={`text-xs px-2 py-1 rounded-full ${project.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : project.status === "in_progress"
                                   ? "bg-blue-100 text-blue-800"
                                   : project.status === "on_hold"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
-                              }`}
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-gray-100 text-gray-800"
+                                }`}
                             >
                               {project.status
                                 .replace("_", " ")
@@ -944,9 +940,9 @@ export default function DashboardPage() {
                   <CardContent>
                     {milestones.length > 0 ? (
                       <div className="space-y-2">
-                        {milestones.slice(0, 5).map((milestone) => (
+                        {milestones.slice(0, 5).map((milestone, i) => (
                           <div
-                            key={milestone.id}
+                            key={i}
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-2">
@@ -979,9 +975,9 @@ export default function DashboardPage() {
                   <CardContent>
                     {issues.length > 0 ? (
                       <div className="space-y-2">
-                        {issues.slice(0, 5).map((issue) => (
+                        {issues.slice(0, 5).map((issue, i) => (
                           <div
-                            key={issue.id}
+                            key={i}
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-2">
@@ -989,15 +985,14 @@ export default function DashboardPage() {
                               <span>{issue.title}</span>
                             </div>
                             <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                issue.priority === "urgent"
-                                  ? "bg-red-100 text-red-800"
-                                  : issue.priority === "high"
+                              className={`text-xs px-2 py-1 rounded-full ${issue.priority === "urgent"
+                                ? "bg-red-100 text-red-800"
+                                : issue.priority === "high"
                                   ? "bg-orange-100 text-orange-800"
                                   : issue.priority === "medium"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-blue-100 text-blue-800"
-                              }`}
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-blue-100 text-blue-800"
+                                }`}
                             >
                               {issue.priority.charAt(0).toUpperCase() +
                                 issue.priority.slice(1)}

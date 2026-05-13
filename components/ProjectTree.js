@@ -370,7 +370,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
                 <MilestoneRow key={m._id || i} milestone={m} index={i} onEdit={(ms) => { setEditData(ms); setModalOpen(true); }} refetch={refetch} />
               )) : (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-muted-foreground font-semibold italic text-sm">
+                  <td colSpan={7} className="py-6 text-center text-muted-foreground font-semibold italic text-sm">
                     No milestones found.
                   </td>
                 </tr>

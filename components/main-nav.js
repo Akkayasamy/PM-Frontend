@@ -38,12 +38,49 @@ export function MainNav({ closeSidebar }) {
       title: "Dashboard",
       href: "/dashboard",
       icon: LayoutDashboard,
-      permission: null, // Everyone can access
+      permission: null,
     },
     {
       title: "Overview",
       href: "/overview",
       icon: GitGraph,
+      permission: null,
+    },
+    {
+      title: "Users",
+      href: "/admin",
+      icon: Shield,
+      permission: null,
+      role: "admin", // Only admin can access
+    },
+    {
+      title: "Teams",
+      href: "/teams",
+      icon: Users,
+      permission: "view_team_members",
+    },
+    {
+      title: "Projects",
+      href: "/projects",
+      icon: Briefcase,
+      permission: "view_projects",
+    },
+    {
+      title: "Milestones",
+      href: "/milestones",
+      icon: Flag,
+      permission: "view_milestones",
+    },
+    {
+      title: "Tasks",
+      href: "/tasks",
+      icon: CheckSquare,
+      permission: "view_tasks",
+    },
+    {
+      title: "Timesheets",
+      href: "/timesheets",
+      icon: CalendarClock,
       permission: null,
     },
     {
@@ -53,35 +90,12 @@ export function MainNav({ closeSidebar }) {
       permission: null,
     },
     {
-      title: "Timesheets",
-      href: "/timesheets",
-      icon: CalendarClock,
-      permission: null,
-    },
-    {
-      title: "Projects",
-      href: "/projects",
-      icon: Briefcase,
-      permission: "view_projects",
-    },
-    {
-      title: "Tasks",
-      href: "/tasks",
-      icon: CheckSquare,
-      permission: "view_tasks",
-    },
-    {
       title: "Sprints",
       href: "/sprints",
       icon: Timer,
       permission: "view_sprints",
     },
-    {
-      title: "Teams",
-      href: "/teams",
-      icon: Users,
-      permission: "view_team_members",
-    },
+
     {
       title: "Consultants",
       href: "/consultants",
@@ -94,12 +108,7 @@ export function MainNav({ closeSidebar }) {
       icon: Building,
       permission: "view_clients",
     },
-    {
-      title: "Milestones",
-      href: "/milestones",
-      icon: Flag,
-      permission: "view_milestones",
-    },
+
     {
       title: "Resources",
       href: "/resources",
@@ -124,13 +133,7 @@ export function MainNav({ closeSidebar }) {
       icon: Settings,
       permission: null,
     },
-    {
-      title: "Users",
-      href: "/admin",
-      icon: Shield,
-      permission: null,
-      role: "admin", // Only admin can access
-    },
+
   ];
 
   return (
