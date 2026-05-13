@@ -52,7 +52,7 @@ const OverViewPage = () => {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-xl font-black text-[#0f172a] uppercase">
-                Project <span className="text-[#2563eb]">Overview</span>
+                Project Overview
               </h1>
               <p className="text-[10px] font-bold text-slate-500 tracking-widest mt-1 uppercase">
                 {totalCount} Total Projects Found
@@ -102,31 +102,33 @@ const ProjectContainer = ({ project, isExpanded, onToggle }) => (
     <motion.div
       layout="position"
       onClick={onToggle}
-      className={`p-4 flex justify-between items-center cursor-pointer transition-colors ${isExpanded ? "bg-[#1e293b] text-white" : "hover:bg-slate-50"
+      className={`p-2 flex justify-between items-center cursor-pointer transition-colors ${isExpanded ? "bg-[#1e293b] text-white" : "hover:bg-slate-50"
         }`}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <motion.span
           animate={{ rotate: isExpanded ? 90 : 0 }}
-          className="text-[10px] text-blue-500"
+          transition={{ duration: 0.2, ease: "easeInOut" }}
+          className={`inline-flex items-center justify-center font-extrabold text-[12px] transition-colors leading-none select-none px-1 ${isExpanded ? "text-white-700" : "text-black-600"
+            }`}
         >
-          ▶
+          {'\u276F'}
         </motion.span>
         <div>
           <h2 className="text-sm font-bold uppercase tracking-tight">
             {project.name}
           </h2>
-          <span className={`text-[9px] font-mono ${isExpanded ? "text-slate-400" : "text-slate-500"}`}>
+          {/* <span className={`text-[9px] font-mono ${isExpanded ? "text-slate-400" : "text-slate-500"}`}>
             {project.projectId}
-          </span>
+          </span> */}
         </div>
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="text-right hidden md:block">
+        {/* <div className="text-right hidden md:block">
           <p className={`text-[9px] font-bold uppercase ${isExpanded ? "text-slate-400" : "text-slate-500"}`}>Budget</p>
           <p className="text-xs font-bold">${project.budget}</p>
-        </div>
+        </div> */}
         <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase border ${isExpanded ? "bg-white/10 border-white/20" : "bg-blue-50 border-blue-100 text-blue-600"
           }`}>
           {project.status?.replace('_', ' ')}
