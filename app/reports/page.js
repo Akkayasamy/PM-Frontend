@@ -18,7 +18,7 @@ import { DashboardShell } from '@/components/dashboard-shell';
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-// --- FIXED IMPORTS ---
+// PDF & Excel Exports
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -37,10 +37,9 @@ export default function ReportsListPage() {
         toDate: "",
         projectId: "all",
         userId: "all",
-        period: "custom" // Added period filter
+        period: "custom"
     });
 
-    // Helper to calculate dates based on preset periods
     const handlePeriodChange = (period) => {
         const today = new Date();
         let from = "";
@@ -68,12 +67,9 @@ export default function ReportsListPage() {
         });
     };
 
-    // --- FIXED PDF EXPORT LOGIC ---
     const exportToPDF = () => {
         try {
             const doc = new jsPDF();
-
-            // Header for the PDF
             doc.setFontSize(18);
             doc.text("Timesheet Report", 14, 15);
             doc.setFontSize(10);
@@ -102,7 +98,6 @@ export default function ReportsListPage() {
             doc.save(`Timesheet_Report_${new Date().getTime()}.pdf`);
         } catch (error) {
             console.error("PDF Generation Error:", error);
-            alert("Failed to generate PDF. Check console for details.");
         }
     };
 
@@ -122,8 +117,6 @@ export default function ReportsListPage() {
                     url: window.location.href
                 });
             } catch (err) { console.error(err); }
-        } else {
-            alert("Web Share API not supported in this browser.");
         }
     };
 
@@ -171,71 +164,73 @@ export default function ReportsListPage() {
 
     if (loading && view === "categories") {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#f4f7f9]">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0091ff] border-t-transparent"></div>
+            <div className="flex h-screen items-center justify-center bg-background">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
             </div>
         );
     }
 
     return (
         <DashboardShell>
-            <div className="min-h-screen bg-[#f4f7f9] text-[13px]">
-                <div className="flex items-center justify-between border-b bg-white px-8 py-4">
+            <div className="min-h-screen bg-background text-[13px] text-foreground">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b bg-card px-8 py-4">
                     <div className="flex items-center gap-3">
-                        <BarChart3 className="text-[#0091ff]" size={24} />
-                        <h1 className="text-xl font-bold text-slate-800">Reports</h1>
+                        <BarChart3 className="text-primary" size={24} />
+                        <h1 className="text-xl font-bold tracking-tight">Reports</h1>
                     </div>
                 </div>
 
                 <div className="mx-auto max-w-6xl p-8">
                     {view === "categories" ? (
                         <div className="flex flex-col gap-6">
-                            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400">Select Category</h2>
+                            <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Select Category</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div onClick={() => setView("project_list")} className="group flex cursor-pointer items-center gap-5 rounded-lg border border-[#e3e9ef] bg-white p-8 shadow-sm transition-all hover:border-[#0091ff] hover:shadow-md">
-                                    <div className="rounded-xl bg-[#f0f7ff] p-5 text-[#0091ff] group-hover:bg-[#0091ff] group-hover:text-white transition-all">
+                                {/* Category Card: Projects */}
+                                <div onClick={() => setView("project_list")} className="group flex cursor-pointer items-center gap-5 rounded-lg border border-border bg-card p-8 shadow-sm transition-all hover:border-primary hover:shadow-md">
+                                    <div className="rounded-xl bg-primary/10 p-5 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                                         <FolderRoot size={40} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-slate-800">Projects</h3>
-                                        <p className="text-slate-500 italic">View reports for {projects.length} projects</p>
+                                        <h3 className="text-lg font-bold">Projects</h3>
+                                        <p className="text-muted-foreground italic">Detailed metrics for {projects.length} projects</p>
                                     </div>
-                                    <ChevronRight className="ml-auto text-slate-300" />
+                                    <ChevronRight className="ml-auto text-muted-foreground/50" />
                                 </div>
 
-                                <div onClick={() => { setView("timesheet_report"); getTimesheetReport(); }} className="group flex cursor-pointer items-center gap-5 rounded-lg border border-[#e3e9ef] bg-white p-8 shadow-sm transition-all hover:border-[#0091ff] hover:shadow-md">
-                                    <div className="rounded-xl bg-[#fff7f0] p-5 text-[#ff9100] group-hover:bg-[#ff9100] group-hover:text-white transition-all">
+                                {/* Category Card: Timesheets */}
+                                <div onClick={() => { setView("timesheet_report"); getTimesheetReport(); }} className="group flex cursor-pointer items-center gap-5 rounded-lg border border-border bg-card p-8 shadow-sm transition-all hover:border-orange-500 hover:shadow-md">
+                                    <div className="rounded-xl bg-orange-500/10 p-5 text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-all">
                                         <Clock size={40} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-bold text-slate-800">Timesheets</h3>
-                                        <p className="text-slate-500 italic">User logs and team hour analysis</p>
+                                        <h3 className="text-lg font-bold">Timesheets</h3>
+                                        <p className="text-muted-foreground italic">Logs and team hour analysis</p>
                                     </div>
-                                    <ChevronRight className="ml-auto text-slate-300" />
+                                    <ChevronRight className="ml-auto text-muted-foreground/50" />
                                 </div>
                             </div>
                         </div>
                     ) : view === "project_list" ? (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-[#0091ff] hover:underline">
+                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-primary hover:underline">
                                     <ArrowLeft size={16} /> Back
                                 </button>
                                 <div className="relative w-full md:w-[350px]">
-                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        type="text"
                                         placeholder="Search projects..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="bg-white pl-10 border-[#e3e9ef]"
+                                        className="pl-10 bg-card border-border h-9"
                                     />
                                 </div>
                             </div>
 
-                            <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+                            <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
                                 <table className="w-full text-left">
-                                    <thead className="bg-[#f9fbff] text-[11px] font-bold uppercase text-slate-500 border-b">
+                                    <thead className="bg-muted/50 text-[11px] font-bold uppercase text-muted-foreground border-b border-border">
                                         <tr>
                                             <th className="px-6 py-4">Project</th>
                                             <th className="px-6 py-4">Client</th>
@@ -243,22 +238,22 @@ export default function ReportsListPage() {
                                             <th className="px-6 py-4 text-right">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-border">
                                         {filteredProjects.map((project) => (
-                                            <tr key={project._id} className="hover:bg-[#fcfdfe]">
+                                            <tr key={project._id} className="hover:bg-muted/30">
                                                 <td className="px-6 py-4">
                                                     <div className="font-bold">{project.name}</div>
-                                                    <div className="text-[11px] text-slate-400">{project.projectId}</div>
+                                                    <div className="text-[11px] text-muted-foreground">{project.projectId}</div>
                                                 </td>
                                                 <td className="px-6 py-4">{project.clientName}</td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <Badge variant={project.active ? "default" : "secondary"}>
+                                                    <Badge variant={project.active ? "default" : "secondary"} className="text-[10px]">
                                                         {project.active ? "ACTIVE" : "INACTIVE"}
                                                     </Badge>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
                                                     <Link href={`/reports/${project._id}`}>
-                                                        <button className="rounded border border-[#0091ff] px-4 py-1.5 text-[11px] font-bold text-[#0091ff] hover:bg-[#0091ff] hover:text-white transition-all">
+                                                        <button className="rounded border border-primary px-4 py-1 text-[11px] font-bold text-primary hover:bg-primary hover:text-white transition-all">
                                                             View
                                                         </button>
                                                     </Link>
@@ -270,32 +265,40 @@ export default function ReportsListPage() {
                             </div>
                         </div>
                     ) : (
+                        /* Timesheet Report View */
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                             <div className="flex items-center justify-between mb-6">
-                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-[#0091ff] hover:underline">
+                                <button onClick={() => setView("categories")} className="flex items-center gap-2 font-bold text-primary hover:underline">
                                     <ArrowLeft size={16} /> Back
                                 </button>
 
                                 {timesheetData.length > 0 && (
                                     <div className="flex items-center gap-2">
-                                        <button onClick={exportToPDF} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-red-100 text-red-600 rounded font-bold hover:bg-red-50">
+                                        <button onClick={exportToPDF} className="flex items-center gap-2 px-3 py-1.5 bg-card border border-red-200 dark:border-red-900/50 text-red-600 rounded font-bold text-[11px] hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
                                             <FileText size={14} /> PDF
                                         </button>
-                                        <button onClick={exportToExcel} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-green-100 text-green-600 rounded font-bold hover:bg-green-50">
+                                        <button onClick={exportToExcel} className="flex items-center gap-2 px-3 py-1.5 bg-card border border-green-200 dark:border-green-900/50 text-green-600 rounded font-bold text-[11px] hover:bg-green-50 dark:hover:bg-green-950/20 transition-all">
                                             <TableIcon size={14} /> Excel
                                         </button>
-                                        <button onClick={handleShare} className="flex items-center gap-2 px-3 py-1.5 bg-[#0091ff] text-white rounded font-bold hover:bg-[#007ad6]">
-                                            <Share2 size={14} /> Share
+                                        <button
+                                            onClick={handleShare}
+                                            className="flex items-center gap-2 px-3 py-1.5 rounded font-bold text-[11px] transition-all
+                                            border border-border bg-background text-foreground hover:bg-muted
+                                            dark:border-white/20 dark:bg-transparent dark:text-white dark:hover:bg-white/10"
+                                        >
+                                            <Share2 size={14} className="text-primary dark:text-sky-400" />
+                                            Share
                                         </button>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="mb-6 grid grid-cols-1 md:grid-cols-6 gap-4 rounded-lg border bg-white p-4 items-end">
+                            {/* Filters Bar */}
+                            <div className="mb-6 grid grid-cols-1 md:grid-cols-6 gap-4 rounded-lg border border-border bg-card p-4 items-end shadow-sm">
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Period</label>
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Period</label>
                                     <select
-                                        className="w-full h-9 rounded-md border px-3 text-[12px]"
+                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] focus:ring-1 focus:ring-primary outline-none"
                                         value={filters.period}
                                         onChange={(e) => handlePeriodChange(e.target.value)}
                                     >
@@ -306,72 +309,81 @@ export default function ReportsListPage() {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">From</label>
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">From</label>
                                     <Input
                                         type="date"
                                         disabled={filters.period !== "custom"}
                                         value={filters.fromDate}
                                         onChange={(e) => setFilters({ ...filters, fromDate: e.target.value })}
-                                        className="h-9"
+                                        className="h-9 text-[12px] bg-background"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">To</label>
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">To</label>
                                     <Input
                                         type="date"
                                         disabled={filters.period !== "custom"}
                                         value={filters.toDate}
                                         onChange={(e) => setFilters({ ...filters, toDate: e.target.value })}
-                                        className="h-9"
+                                        className="h-9 text-[12px] bg-background"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Project</label>
-                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.projectId} onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}>
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Project</label>
+                                    <select
+                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
+                                        value={filters.projectId}
+                                        onChange={(e) => setFilters({ ...filters, projectId: e.target.value })}
+                                    >
                                         <option value="all">All Projects</option>
                                         {projects.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase">Employee</label>
-                                    <select className="w-full h-9 rounded-md border px-3 text-[12px]" value={filters.userId} onChange={(e) => setFilters({ ...filters, userId: e.target.value })}>
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee</label>
+                                    <select
+                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
+                                        value={filters.userId}
+                                        onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                                    >
                                         <option value="all">All Employees</option>
-                                        {users.map(u => <option key={u._id} value={u._id}>{u.name}({u.role})</option>)}
+                                        {users.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}
                                     </select>
                                 </div>
-                                <button onClick={getTimesheetReport} className="h-9 rounded bg-[#0091ff] font-bold text-white hover:bg-[#007ad6]">
+                                <button
+                                    onClick={getTimesheetReport}
+                                    className="h-9 px-6 rounded-md border border-border bg-background text-[12px] font-bold text-foreground transition-all hover:bg-muted active:scale-95 dark:border-border dark:bg-background dark:text-white dark:hover:bg-muted"
+                                >
                                     Filter
                                 </button>
                             </div>
 
-                            <div className="overflow-hidden rounded-lg border bg-white">
+                            <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
                                 <table className="w-full text-left">
-                                    <thead className="bg-[#f9fbff] text-[11px] font-bold uppercase border-b">
+                                    <thead className="bg-muted/50 text-[11px] font-bold uppercase border-b border-border text-muted-foreground">
                                         <tr>
                                             <th className="px-6 py-4 text-center">Date</th>
                                             <th className="px-6 py-4">Project</th>
-                                            <th className="px-6 py-4">Milestone name</th>
-                                            <th className="px-6 py-4">Task name</th>
+                                            <th className="px-6 py-4">Task</th>
                                             <th className="px-6 py-4">Employee</th>
                                             <th className="px-6 py-4 text-center">Hours</th>
-                                            {/* <th className="px-6 py-4">Status</th> */}
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-100">
+                                    <tbody className="divide-y divide-border">
                                         {timesheetData.length > 0 ? timesheetData.map((ts, idx) => (
-                                            <tr key={idx} className="hover:bg-[#fcfdfe]">
-                                                <td className="px-6 py-4 text-center">{new Date(ts.date).toLocaleDateString()}</td>
-                                                <td className="px-6 py-4 text-slate-600">{ts.projectName}</td>
-                                                <td className="px-6 py-4 text-slate-600">{ts?.milestoneName || "-"}</td>
-                                                <td className="px-6 py-4 text-slate-600">{ts?.taskName || "-"}</td>
+                                            <tr key={idx} className="hover:bg-muted/30">
+                                                <td className="px-6 py-4 text-center text-muted-foreground">
+                                                    {ts.date ? new Date(ts.date).toLocaleDateString() : '-'}
+                                                </td>
+                                                <td className="px-6 py-4 font-medium">{ts.projectName}</td>
+                                                <td className="px-6 py-4 text-muted-foreground">{ts?.taskName || "-"}</td>
                                                 <td className="px-6 py-4 font-bold">{ts.userName}</td>
-                                                <td className="px-6 py-4 text-center text-[#0091ff] font-bold">{ts.hours}h</td>
-                                                {/* <td className="px-6 py-4">
-                                                    <Badge variant={ts.status === 'Approved' ? 'default' : 'outline'}>{ts.status}</Badge>
-                                                </td> */}
+                                                <td className="px-6 py-4 text-center text-primary font-bold">{ts.hours}h</td>
                                             </tr>
                                         )) : (
-                                            <tr><td colSpan={5} className="py-20 text-center text-slate-400">No records found.</td></tr>
+                                            <tr>
+                                                <td colSpan={5} className="py-20 text-center text-muted-foreground italic">No records found.</td>
+                                            </tr>
                                         )}
                                     </tbody>
                                 </table>
