@@ -566,7 +566,7 @@ export default function TeamsPage() {
                       </TableCell>
                       <TableCell>
                         {team.deliveryManager
-                          ? getUser(team.leadId)?.name || "Unassigned"
+                          ? getUser(team.deliveryManager)?.name || "Unassigned"
                           : "Unassigned"}
                       </TableCell>
                       <TableCell>

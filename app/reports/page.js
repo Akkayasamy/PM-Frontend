@@ -340,6 +340,18 @@ export default function ReportsListPage() {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
+                                    <label className="text-[10px] font-bold text-muted-foreground uppercase">Team</label>
+                                    <select
+                                        className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
+                                        value={filters.userId}
+                                        onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                                    >
+                                        <option value="all">All Employees</option>
+                                        {users.map(u => (u?.role == "project_manager" || u?.role == "Team Leader") && (<option key={u._id} value={u._id}>{u.name}</option>))}
+                                    </select>
+                                </div>
+
+                                <div className="space-y-1">
                                     <label className="text-[10px] font-bold text-muted-foreground uppercase">Employee</label>
                                     <select
                                         className="w-full h-9 rounded-md border border-border bg-background px-2 text-[12px] outline-none"
@@ -347,7 +359,7 @@ export default function ReportsListPage() {
                                         onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
                                     >
                                         <option value="all">All Employees</option>
-                                        {users.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}
+                                        {users.map(u => u?.role === "team_member" && (<option key={u._id} value={u._id}>{u.name}</option>))}
                                     </select>
                                 </div>
                                 <button
