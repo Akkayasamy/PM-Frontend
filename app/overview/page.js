@@ -19,6 +19,8 @@ const OverViewPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [expandedProjectId, setExpandedProjectId] = useState(null);
 
+  console.log(projects, 'projects<<<<<')
+
   // Matches your requested fetch style
   const fetchProjects = async () => {
     setLoading(true);

@@ -166,7 +166,10 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
               <tr>
                 <ITH className="bg-violet-50 text-violet-700 w-8">#</ITH>
                 <ITH className="bg-violet-50 text-violet-700">Subtask Title</ITH>
-                <ITH className="bg-violet-50 text-violet-700">Assignee</ITH>
+                <ITH className="bg-violet-50 text-violet-700">Created By</ITH>
+                <ITH className="bg-violet-50 text-violet-700">Estimated Hours</ITH>
+                <ITH className="bg-violet-50 text-violet-700">Start Date</ITH>
+                <ITH className="bg-violet-50 text-violet-700">End Date</ITH>
                 <ITH className="bg-violet-50 text-violet-700 text-right">Actions</ITH>
               </tr>
             </thead>
@@ -177,8 +180,14 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
                     <ITD className="text-slate-400 font-mono text-[10px]">{i + 1}</ITD>
                     <ITD className="font-semibold text-slate-800">{st.title}</ITD>
                     <ITD>
-                      <Avatar name={fullName(st.assignee)} size={20} />
+                      <div className="flex items-center gap-2">
+                        <Avatar name={st?.userData?.name} size={22} />
+                        <span className="text-[11px] font-semibold text-slate-600 truncate max-w-[100px]">{st?.userData?.name}</span>
+                      </div>
                     </ITD>
+                    <ITD className="font-semibold text-slate-800">{st?.estimatedHours || '-'}</ITD>
+                    <ITD className="font-semibold text-slate-800">{st?.startDate || '-'}</ITD>
+                    <ITD className="font-semibold text-slate-800">{st.endDate || '-'}</ITD>
                     <ITD className="text-right">
                       <ActionBtn onClick={() => onEditSubtask?.(st)} />
                     </ITD>
@@ -210,7 +219,7 @@ const TaskRow = ({ task, index, onEditTask, onEditSubtask, onEditTimesheet }) =>
   const [open, setOpen] = useState(false);
   // Important: Check both subtasks and timesheets to determine if row is expandable
   const hasChild = (task.subtasks && task.subtasks.length > 0) || (task.timesheets && task.timesheets.length > 0);
-  const name = fullName(task.assignee);
+  const name = task?.userDetails?.name || '-';
 
   return (
     <>
@@ -361,7 +370,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [isSectionOpen, setIsSectionOpen] = useState(true);
-  
+
   return (
     <div className="p-2 bg-slate-50/30 rounded-xl">
       <SectionToggleBtn label="Project Milestones" open={isSectionOpen} onToggle={() => setIsSectionOpen(p => !p)} color="#303F9F" />
