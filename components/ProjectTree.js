@@ -95,7 +95,7 @@ const ITD = ({ children, className = "" }) => (
   </td>
 );
 
-const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
+const TimesheetSection = ({ timesheets = [], onEditTimesheet, userData }) => {
   const [open, setOpen] = useState(false);
   if (!timesheets || timesheets.length === 0) return null;
 
@@ -113,8 +113,9 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
             <thead>
               <tr>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Work Date</ITH>
-                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Remarks</ITH>
+                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Logged By</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400 text-center">Hours</ITH>
+                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Remarks</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400 text-center">Status</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400 text-right ">Actions</ITH>
               </tr>
@@ -123,12 +124,13 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
               {timesheets.map((ts, i) => (
                 <tr key={ts._id || i} className="hover:bg-cyan-500/5 transition-colors">
                   <ITD className="font-semibold text-foreground">{ts.date ? new Date(ts.date).toISOString().split("T")[0] : "—"}</ITD>
-                  <ITD className="text-muted-foreground italic max-w-[200px] truncate">{ts.remarks || ts.description || "—"}</ITD>
+                  <ITD className="font-semibold text-foreground">{userData?.name || "—"}</ITD>
                   <ITD className="text-center">
                     <span className="font-bold text-cyan-600 bg-cyan-500/10 px-2 py-0.5 rounded-full text-[11px]">
                       {ts.hours || ts.hoursWorked || "0"}h
                     </span>
                   </ITD>
+                  <ITD className="text-muted-foreground italic max-w-[200px] truncate">{ts.remarks || ts.description || "—"}</ITD>
                   <ITD className="text-center"><StatusBadge status={ts.approvalStatus || ts.status} /></ITD>
                   <ITD className="text-right">
                     <ActionBtn onClick={() => window.open("/timesheets", "_blank")} />
@@ -187,7 +189,7 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
                   {(st.timesheets?.length > 0 || st.subtasks?.length > 0 || st.children?.length > 0) && (
                     <tr>
                       <td colSpan={7} className="px-3 pb-2 bg-muted/10">
-                        <TimesheetSection timesheets={st.timesheets} onEditTimesheet={onEditTimesheet} />
+                        <TimesheetSection timesheets={st.timesheets} onEditTimesheet={onEditTimesheet} userData={st?.userData} />
                         <SubtaskSection
                           subtasks={st.subtasks || st.children}
                           onEditSubtask={onEditSubtask}
@@ -247,6 +249,7 @@ const TaskRow = ({ task, index, onEditTask, onEditSubtask, onEditTimesheet }) =>
             <TimesheetSection
               timesheets={task.timesheets}
               onEditTimesheet={onEditTimesheet}
+              userData={task?.userDetails}
             />
           </td>
         </tr>

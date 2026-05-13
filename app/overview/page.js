@@ -95,7 +95,7 @@ const ProjectContainer = ({ project, isExpanded, onToggle }) => (
       layout="position"
       onClick={onToggle}
       className={`p-2 flex justify-between items-center cursor-pointer transition-colors ${
-        isExpanded ? "bg-indigo-600 text-white" : "hover:bg-muted/50 text-foreground"
+        isExpanded ? "bg-[#607799] text-white" : "hover:bg-muted/50 text-foreground"
       }`}
     >
       <div className="flex items-center gap-2">
