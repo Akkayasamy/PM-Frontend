@@ -21,7 +21,8 @@ import {
   Building,
   Timer,
   FileText,
-  CalendarClock 
+  CalendarClock,
+  GitGraph
 } from "lucide-react";
 
 export function MainNav({ closeSidebar }) {
@@ -40,6 +41,12 @@ export function MainNav({ closeSidebar }) {
       permission: null, // Everyone can access
     },
     {
+      title: "Overview",
+      href: "/overview",
+      icon: GitGraph,
+      permission: null,
+    },
+    {
       title: "Reports",
       href: "/reports",
       icon: FileText,
@@ -48,13 +55,7 @@ export function MainNav({ closeSidebar }) {
     {
       title: "Timesheets",
       href: "/timesheets",
-      icon: CalendarClock ,
-      permission: null,
-    },
-     {
-      title: "Overview",
-      href: "/overview",
-      icon: CalendarClock ,
+      icon: CalendarClock,
       permission: null,
     },
     {

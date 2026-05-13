@@ -142,7 +142,7 @@ const ProjectContainer = ({ project, isExpanded, onToggle }) => (
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="p-6 bg-white border-t border-slate-100"
+          className="p-1 bg-white border-t border-slate-100"
         >
           <ProjectTree milestones={project.milestones} />
         </motion.div>

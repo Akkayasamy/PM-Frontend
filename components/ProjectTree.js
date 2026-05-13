@@ -119,8 +119,8 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
                 <ITH className="!bg-cyan-50 !text-cyan-700">Work Date</ITH>
                 <ITH className="!bg-cyan-50 !text-cyan-700">Remarks</ITH>
                 <ITH className="!bg-cyan-50 !text-cyan-700 text-center">Hours</ITH>
-                <ITH className="!bg-cyan-50 !text-cyan-700">Status</ITH>
-                {/* <ITH className="!bg-cyan-50 !text-cyan-700 text-right">Actions</ITH> */}
+                <ITH className="!bg-cyan-50 !text-cyan-700 text-center">Status</ITH>
+                <ITH className="!bg-cyan-50 !text-cyan-700 text-right ">Actions</ITH>
               </tr>
             </thead>
             <tbody>
@@ -133,10 +133,13 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
                       {ts.hours || ts.hoursWorked || "0"}h
                     </span>
                   </ITD>
-                  <ITD><StatusBadge status={ts.approvalStatus || ts.status} /></ITD>
-                  {/* <ITD className="text-right">
-                    <ActionBtn onClick={() => onEditTimesheet?.(ts)} />
-                  </ITD> */}
+                  <ITD className="text-center"><StatusBadge status={ts.approvalStatus || ts.status} /></ITD>
+                  <ITD className="text-right">
+                    <ActionBtn onClick={() => 
+                      // onEditTimesheet?.(ts)
+                      window.open("/timesheets", "_blank")
+                      } />
+                  </ITD>
                 </tr>
               ))}
             </tbody>
@@ -239,9 +242,12 @@ const TaskRow = ({ task, index, onEditTask, onEditSubtask, onEditTimesheet }) =>
         <td className="py-2.5 px-3 text-[11px] font-medium text-slate-500">{task.startDate || "—"}</td>
         <td className="py-2.5 px-3 text-[11px] font-medium text-slate-500">{task.endDate || "—"}</td>
         <td className="py-2.5 px-3"><StatusBadge status={task.status} /></td>
-        {/* <td className="py-2.5 px-3 text-right">
-          <ActionBtn onClick={() => onEditTask(task)} />
-        </td> */}
+        <td className="py-2.5 px-3 text-right">
+          <ActionBtn onClick={() =>
+            //  onEditTask(task)
+            window.open("/tasks", "_blank")
+          } />
+        </td>
       </tr>
 
       {open && hasChild && (
@@ -287,7 +293,7 @@ const TaskSection = ({ tasks = [], onEditTask, onEditSubtask, onEditTimesheet })
                 <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-700 w-28">Start Date</th>
                 <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-700 w-28">End Date</th>
                 <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-700 w-28">Status</th>
-                {/* <th className="py-2 px-3 text-right text-[10px] font-bold uppercase text-sky-700 w-16">Actions</th> */}
+                <th className="py-2 px-3 text-right text-[10px] font-bold uppercase text-sky-700 w-16">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -339,9 +345,12 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
         <td className="py-3 px-3 text-[11px] font-semibold text-slate-500">{milestone.startDate || "—"}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-slate-500">{milestone.endDate || milestone.dueDate || "—"}</td>
         <td className="py-3 px-3"><StatusBadge status={milestone.status} /></td>
-        {/* <td className="py-3 px-3 text-right">
-          <ActionBtn onClick={() => onEdit(milestone)} />
-        </td> */}
+        <td className="py-3 px-3 text-right">
+          <ActionBtn onClick={() =>
+            // onEdit(milestone)
+            window.open("/milestones", "_blank")
+          } />
+        </td>
       </tr>
 
       {open && (
@@ -383,7 +392,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-28">Start</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-28">Due Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-28">Status</th>
-                {/* <th className="py-2.5 px-3 text-right text-[10px] font-black uppercase text-indigo-700 w-20">Actions</th> */}
+                <th className="py-2.5 px-3 text-right text-[10px] font-black uppercase text-indigo-700 w-20">Actions</th>
               </tr>
             </thead>
             <tbody>
