@@ -112,7 +112,7 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
         color="#0891b2"
       />
       {open && (
-        <div className="rounded-lg border border-cyan-100 overflow-hidden shadow-sm bg-white mb-3">
+        <div className="rounded-lg border border-cyan-100 overflow-hidden shadow-sm bg-white mb-3 mr-4">
           <table className="w-full border-collapse">
             <thead>
               <tr>
@@ -192,10 +192,9 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
                       <ActionBtn onClick={() => onEditSubtask?.(st)} />
                     </ITD>
                   </tr>
-                  {/* Recursive Support for children nested in subtasks */}
                   {(st.timesheets?.length > 0 || st.subtasks?.length > 0 || st.children?.length > 0) && (
                     <tr>
-                      <td colSpan={4} className="px-3 pb-2 bg-slate-50/30">
+                      <td colSpan={7} className="px-3 pb-2 bg-slate-50/30">
                         <TimesheetSection timesheets={st.timesheets} onEditTimesheet={onEditTimesheet} />
                         <SubtaskSection
                           subtasks={st.subtasks || st.children}
@@ -217,7 +216,6 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
 
 const TaskRow = ({ task, index, onEditTask, onEditSubtask, onEditTimesheet }) => {
   const [open, setOpen] = useState(false);
-  // Important: Check both subtasks and timesheets to determine if row is expandable
   const hasChild = (task.subtasks && task.subtasks.length > 0) || (task.timesheets && task.timesheets.length > 0);
   const name = task?.userDetails?.name || '-';
 
