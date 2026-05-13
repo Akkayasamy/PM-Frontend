@@ -396,8 +396,8 @@ export default function CalendarPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Projects</SelectItem>
-                {projects.map((project) => (
-                  <SelectItem key={project.id} value={project._id}>
+                {projects.map((project, i) => (
+                  <SelectItem key={i} value={project._id}>
                     {project.name}
                   </SelectItem>
                 ))}
@@ -486,9 +486,8 @@ export default function CalendarPage() {
             <DialogTitle>
               {isEditMode
                 ? selectedEvent
-                  ? `Edit ${
-                      selectedEvent.type === "task" ? "Task" : "Milestone"
-                    }`
+                  ? `Edit ${selectedEvent.type === "task" ? "Task" : "Milestone"
+                  }`
                   : `Add New ${newEvent.type === "task" ? "Task" : "Milestone"}`
                 : selectedEvent?.title}
             </DialogTitle>
@@ -674,7 +673,7 @@ export default function CalendarPage() {
                 <p>
                   {selectedEvent?.projectId
                     ? projects.find((p) => p._id === selectedEvent.projectId)
-                        ?.name || "Unknown Project"
+                      ?.name || "Unknown Project"
                     : "No project assigned"}
                 </p>
               </div>

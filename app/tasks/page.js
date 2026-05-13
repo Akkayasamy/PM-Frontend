@@ -558,7 +558,7 @@ export default function TasksPage() {
       const csvRows = filteredTasks.map((task) => {
         const project = task.projectId
           ? getItemById("projects", Number.parseInt(task.projectId))?.name ||
-            "Unassigned"
+          "Unassigned"
           : "Unassigned";
 
         return [
@@ -874,8 +874,8 @@ export default function TasksPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Projects</SelectItem>
-                {projects.map((project) => (
-                  <SelectItem key={project._id} value={project._id}>
+                {projects.map((project, i) => (
+                  <SelectItem key={i} value={project._id}>
                     {project.name}
                   </SelectItem>
                 ))}
@@ -898,15 +898,15 @@ export default function TasksPage() {
               projectFilter !== "all" ||
               activeFilter !== "all" ||
               searchTerm) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                className="h-8"
-              >
-                <X className="h-4 w-4 mr-1" /> Clear
-              </Button>
-            )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="h-8"
+                >
+                  <X className="h-4 w-4 mr-1" /> Clear
+                </Button>
+              )}
           </div>
 
           {/* Main Content */}
@@ -1038,8 +1038,8 @@ export default function TasksPage() {
                         </TableCell>
                       </TableRow>
                     ) : (
-                      paginatedTasks.map((task) => (
-                        <TableRow key={task.id}>
+                      paginatedTasks.map((task, i) => (
+                        <TableRow key={i}>
                           <TableCell>{task.taskId || "-"}</TableCell>
                           <TableCell className="font-medium">
                             <div className="flex items-center">

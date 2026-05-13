@@ -694,8 +694,8 @@ export default function AdminPage() {
                         Project Manager
                       </SelectItem>
                       <SelectItem value="team_member">Team Member</SelectItem>
-                      {roles.map((role) => (
-                        <SelectItem key={role.id} value={`custom_${role.id}`}>
+                      {roles.map((role, i) => (
+                        <SelectItem key={i} value={`custom_${role.id}`}>
                           {role.name}
                         </SelectItem>
                       ))}
@@ -1771,8 +1771,8 @@ export default function AdminPage() {
                         <p className="mt-1">
                           {currentRole?.createdAt
                             ? new Date(
-                                currentRole.createdAt
-                              ).toLocaleDateString()
+                              currentRole.createdAt
+                            ).toLocaleDateString()
                             : "Unknown"}
                         </p>
                       </div>

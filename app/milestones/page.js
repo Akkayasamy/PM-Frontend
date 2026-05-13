@@ -310,8 +310,8 @@ export default function MilestonesPage() {
                           <SelectValue placeholder="Select a project" />
                         </SelectTrigger>
                         <SelectContent>
-                          {projects.map((project) => (
-                            <SelectItem key={project._id} value={project._id}>
+                          {projects.map((project, i) => (
+                            <SelectItem key={i} value={project._id}>
                               {project.name}
                             </SelectItem>
                           ))}
@@ -370,7 +370,7 @@ export default function MilestonesPage() {
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {milestones.map((milestone) => {
+              {milestones.map((milestone, i) => {
                 const progress = getMilestoneProgress(milestone.id);
                 const project = milestone.projectId
                   ? getItemById(
@@ -380,7 +380,7 @@ export default function MilestonesPage() {
                   : null;
 
                 return (
-                  <Card key={milestone.id}>
+                  <Card key={i}>
                     <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         {getStatusBadge(milestone.status)}
@@ -512,8 +512,8 @@ export default function MilestonesPage() {
                     <SelectValue placeholder="Select a project" />
                   </SelectTrigger>
                   <SelectContent>
-                    {projects.map((project) => (
-                      <SelectItem key={project._id} value={project._id}>
+                    {projects.map((project, i) => (
+                      <SelectItem key={i} value={project._id}>
                         {project.name}
                       </SelectItem>
                     ))}

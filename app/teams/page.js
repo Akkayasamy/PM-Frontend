@@ -406,8 +406,8 @@ export default function TeamsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Leads</SelectItem>
-                {teamMembers.map((member) => (
-                  <SelectItem key={member._id} value={member._id}>
+                {teamMembers.map((member, i) => (
+                  <SelectItem key={i} value={member._id}>
                     {member.name}
                   </SelectItem>
                 ))}
@@ -553,8 +553,8 @@ export default function TeamsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedTeams.map((team) => (
-                    <TableRow key={team.id} className="hover:bg-muted/50">
+                  paginatedTeams.map((team, i) => (
+                    <TableRow key={i} className="hover:bg-muted/50">
                       <TableCell className="font-medium">
                         {team.teamId || "-"}
                       </TableCell>
@@ -676,8 +676,8 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a team lead" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member) => (
-                              <SelectItem key={member._id} value={member._id}>
+                            {teamMembers.map((member, i) => (
+                              <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
                             ))}
@@ -698,8 +698,8 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a delivery manager" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member) => (
-                              <SelectItem key={member._id} value={member._id}>
+                            {teamMembers.map((member, i) => (
+                              <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
                             ))}
@@ -730,13 +730,13 @@ export default function TeamsPage() {
                             No members added yet
                           </p>
                         ) : (
-                          formData.members.map((memberId) => {
+                          formData.members.map((memberId, i) => {
                             const member = users.find(
                               (u) => u._id === memberId
                             );
                             return member ? (
                               <Badge
-                                key={memberId}
+                                key={i}
                                 variant="secondary"
                                 className="flex items-center gap-1"
                               >
@@ -768,8 +768,8 @@ export default function TeamsPage() {
                             .filter(
                               (member) => !formData.members.includes(member._id)
                             )
-                            .map((member) => (
-                              <SelectItem key={member._id} value={member._id}>
+                            .map((member, i) => (
+                              <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
                             ))}
@@ -840,8 +840,8 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a team lead" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member) => (
-                              <SelectItem key={member._id} value={member._id}>
+                            {teamMembers.map((member, i) => (
+                              <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
                             ))}
@@ -862,8 +862,8 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a delivery manager" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member) => (
-                              <SelectItem key={member._id} value={member._id}>
+                            {teamMembers.map((member, i) => (
+                              <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
                             ))}
@@ -894,13 +894,13 @@ export default function TeamsPage() {
                             No members added yet
                           </p>
                         ) : (
-                          formData.members.map((memberId) => {
+                          formData.members.map((memberId, i) => {
                             const member = users.find(
                               (u) => u._id === memberId
                             );
                             return member ? (
                               <Badge
-                                key={memberId}
+                                key={i}
                                 variant="secondary"
                                 className="flex items-center gap-1"
                               >
@@ -932,8 +932,8 @@ export default function TeamsPage() {
                             .filter(
                               (member) => !formData.members.includes(member._id)
                             )
-                            .map((member) => (
-                              <SelectItem key={member._id} value={member._id}>
+                            .map((member, i) => (
+                              <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
                             ))}
@@ -1050,12 +1050,12 @@ export default function TeamsPage() {
                     {currentTeam.members && currentTeam.members.length > 0 ? (
                       <div className="mt-2 space-y-2">
                         <div className="flex flex-wrap gap-2">
-                          {currentTeam.members.map((memberId) => {
+                          {currentTeam.members.map((memberId, i) => {
                             const member = users.find(
                               (u) => u._id === memberId
                             );
                             return member ? (
-                              <Badge key={memberId} variant="outline">
+                              <Badge key={i} variant="outline">
                                 {member.name}
                               </Badge>
                             ) : null;
