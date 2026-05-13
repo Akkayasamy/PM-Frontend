@@ -27,7 +27,7 @@ const OverViewPage = () => {
       const response = await api.get(`/projects/tree`, {
         params: { search, currentPage }
       });
-      
+
       // MongoDB returns 'results' and 'totalCount' from our controller
       setProjects(response.data.results || []);
       setTotalCount(response.data.totalCount || 0);
@@ -56,7 +56,7 @@ const OverViewPage = () => {
                 {totalCount} Total Projects Found
               </p>
             </div>
-            
+
             <div className="relative">
               <input
                 className="border border-slate-200 p-2 pl-4 rounded-lg w-72 text-sm shadow-sm outline-none focus:ring-2 ring-blue-500 transition-all"
@@ -100,12 +100,11 @@ const ProjectContainer = ({ project, isExpanded, onToggle }) => (
     <motion.div
       layout="position"
       onClick={onToggle}
-      className={`p-4 flex justify-between items-center cursor-pointer transition-colors ${
-        isExpanded ? "bg-[#1e293b] text-white" : "hover:bg-slate-50"
-      }`}
+      className={`p-4 flex justify-between items-center cursor-pointer transition-colors ${isExpanded ? "bg-[#1e293b] text-white" : "hover:bg-slate-50"
+        }`}
     >
       <div className="flex items-center gap-4">
-        <motion.span 
+        <motion.span
           animate={{ rotate: isExpanded ? 90 : 0 }}
           className="text-[10px] text-blue-500"
         >
@@ -126,9 +125,8 @@ const ProjectContainer = ({ project, isExpanded, onToggle }) => (
           <p className={`text-[9px] font-bold uppercase ${isExpanded ? "text-slate-400" : "text-slate-500"}`}>Budget</p>
           <p className="text-xs font-bold">${project.budget}</p>
         </div>
-        <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase border ${
-          isExpanded ? "bg-white/10 border-white/20" : "bg-blue-50 border-blue-100 text-blue-600"
-        }`}>
+        <div className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase border ${isExpanded ? "bg-white/10 border-white/20" : "bg-blue-50 border-blue-100 text-blue-600"
+          }`}>
           {project.status?.replace('_', ' ')}
         </div>
       </div>

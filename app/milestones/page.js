@@ -70,6 +70,7 @@ export default function MilestonesPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    startDate: "",
     dueDate: "",
     projectId: "",
     status: "planned",
@@ -275,15 +276,27 @@ export default function MilestonesPage() {
                         onChange={handleInputChange}
                       />
                     </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="dueDate">Due Date</Label>
-                      <Input
-                        id="dueDate"
-                        name="dueDate"
-                        type="date"
-                        value={formData.dueDate}
-                        onChange={handleInputChange}
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="startDate">Start Date</Label>
+                        <Input
+                          id="startDate"
+                          name="startDate"
+                          type="date"
+                          value={formData.startDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="dueDate">Due Date</Label>
+                        <Input
+                          id="dueDate"
+                          name="dueDate"
+                          type="date"
+                          value={formData.dueDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="projectId">Project</Label>
@@ -361,9 +374,9 @@ export default function MilestonesPage() {
                 const progress = getMilestoneProgress(milestone.id);
                 const project = milestone.projectId
                   ? getItemById(
-                      "projects",
-                      Number.parseInt(milestone.projectId)
-                    )
+                    "projects",
+                    Number.parseInt(milestone.projectId)
+                  )
                   : null;
 
                 return (
@@ -465,15 +478,27 @@ export default function MilestonesPage() {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-dueDate">Due Date</Label>
-                <Input
-                  id="edit-dueDate"
-                  name="dueDate"
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={handleInputChange}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="startDate">Start Date</Label>
+                  <Input
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="dueDate">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    name="dueDate"
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-projectId">Project</Label>

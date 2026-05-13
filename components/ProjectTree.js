@@ -126,7 +126,7 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet }) => {
             <tbody>
               {timesheets.map((ts, i) => (
                 <tr key={ts._id || i} className="hover:bg-cyan-50/40 transition-colors">
-                  <ITD className="font-semibold text-slate-800">{ts.workDate || "—"}</ITD>
+                  <ITD className="font-semibold text-slate-800">{ts.date ? new Date(ts.date).toISOString().split("T")[0] : "—"}</ITD>
                   <ITD className="text-slate-500 italic max-w-[200px] truncate">{ts.remarks || ts.description || "—"}</ITD>
                   <ITD className="text-center">
                     <span className="font-bold text-cyan-700 bg-cyan-50 px-2 py-0.5 rounded-full text-[11px]">
@@ -323,12 +323,12 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
           </div>
         </td>
         <td className="py-3 px-3 font-bold text-slate-800 text-[13px]">{milestone.name || milestone.title}</td>
-        <td className="py-3 px-3">
+        {/* <td className="py-3 px-3">
           <div className="flex items-center gap-2">
             <Avatar name={ownerName} size={22} />
             <span className="text-[11px] font-semibold text-slate-600">{ownerName}</span>
           </div>
-        </td>
+        </td> */}
         <td className="py-3 px-3 text-[11px] font-semibold text-slate-500">{milestone.startDate || "—"}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-slate-500">{milestone.endDate || milestone.dueDate || "—"}</td>
         <td className="py-3 px-3"><StatusBadge status={milestone.status} /></td>
@@ -361,7 +361,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [isSectionOpen, setIsSectionOpen] = useState(true);
-
+  
   return (
     <div className="p-2 bg-slate-50/30 rounded-xl">
       <SectionToggleBtn label="Project Milestones" open={isSectionOpen} onToggle={() => setIsSectionOpen(p => !p)} color="#303F9F" />
@@ -372,7 +372,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
               <tr className="bg-indigo-50/80 border-b border-indigo-100">
                 <th className="py-2.5 px-4 text-left text-[10px] font-black uppercase tracking-wider text-indigo-700 w-20">#</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700">Milestone Name</th>
-                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-36">Owner</th>
+                {/* <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-36">Owner</th> */}
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-28">Start</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-28">Due Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-700 w-28">Status</th>
