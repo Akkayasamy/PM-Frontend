@@ -362,7 +362,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
               <tr className="bg-muted/50 border-b border-border">
                 <th className="py-2.5 px-4 text-left text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 w-20">#</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400">Milestone Name</th>
-                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Start</th>
+                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Start Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Due Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Status</th>
                 <th className="py-2.5 px-3 text-right text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-20">Actions</th>

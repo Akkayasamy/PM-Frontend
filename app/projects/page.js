@@ -370,6 +370,7 @@ export default function ProjectsPage() {
       description: "",
       status: "planning",
       managerId: "",
+      actualDate: ""
     });
     setCurrentProject(null);
   };
@@ -482,6 +483,7 @@ export default function ProjectsPage() {
       description: project.description || "",
       status: project.status || "planning",
       managerId: project.managerId || "",
+      actualDate: project.actualDate || ""
     });
     setIsEditDialogOpen(true);
   };
@@ -1165,7 +1167,7 @@ export default function ProjectsPage() {
                         type="date"
                         value={formData.actualDate}
                         onChange={handleInputChange}
-                        max={formData.actualDate}
+                        min={formData.startDate}
                       />
                     </div>
                   </div>
@@ -1810,14 +1812,14 @@ export default function ProjectsPage() {
                     </div>
 
                     <div className="grid ">
-                      <Label htmlFor="edit-actualDate">Start Date</Label>
+                      <Label htmlFor="edit-actualDate">Actual Date</Label>
                       <Input
                         id="edit-actualDate"
                         name="actualDate"
                         type="date"
                         value={formData.actualDate}
                         onChange={handleInputChange}
-                        max={formData.actualDate}
+                        min={formData.startDate}
                       />
                     </div>
                   </div>
