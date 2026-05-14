@@ -110,7 +110,9 @@ export default function ProjectsPage() {
     description: "",
     status: "not_started",
     managerId: "",
+    actualDate: ""
   });
+
 
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState("");
@@ -657,9 +659,9 @@ export default function ProjectsPage() {
             </div>
           )}
 
-          {project.projectType && (
+          {project.projectType?.typeName && (
             <div className="text-xs text-muted-foreground">
-              📋 {project.projectType?._id}
+              📋 {project.projectType?.typeName}
             </div>
           )}
 
@@ -1121,7 +1123,7 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div className="grid gap-2">
                       <Label htmlFor="startDate">Start Date</Label>
                       <Input
@@ -1133,7 +1135,7 @@ export default function ProjectsPage() {
                         max={formData.endDate}
                       />
                     </div>
-                    <div className="grid gap-2">
+                    <div className="grid ">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="endDate">End Date</Label>
                         {formData.startDate && formData.endDate && (
@@ -1152,6 +1154,18 @@ export default function ProjectsPage() {
                         value={formData.endDate}
                         onChange={handleInputChange}
                         min={formData.startDate}
+                      />
+                    </div>
+
+                    <div className="grid ">
+                      <Label htmlFor="actualDate">Actual Date</Label>
+                      <Input
+                        id="actualDate"
+                        name="actualDate"
+                        type="date"
+                        value={formData.actualDate}
+                        onChange={handleInputChange}
+                        max={formData.actualDate}
                       />
                     </div>
                   </div>
@@ -1468,7 +1482,7 @@ export default function ProjectsPage() {
                             Project Type
                           </h3>
                           <p className="mt-1">
-                            {currentProject.projectType || "N/A"}
+                            {currentProject.projectType?.typeName || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -1667,20 +1681,20 @@ export default function ProjectsPage() {
 
                     <TabsContent value="details" className="space-y-4 mt-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        {/* <div>
                           <h3 className="text-sm font-medium text-muted-foreground">
                             Project Group
                           </h3>
                           <p className="mt-1">
                             {currentProject.projectGroup || "N/A"}
                           </p>
-                        </div>
+                        </div> */}
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground">
                             Project Type
                           </h3>
                           <p className="mt-1">
-                            {currentProject.projectType || "N/A"}
+                            {currentProject.projectType?.typeName || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -1761,8 +1775,8 @@ export default function ProjectsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="grid">
                       <Label htmlFor="edit-startDate">Start Date</Label>
                       <Input
                         id="edit-startDate"
@@ -1773,7 +1787,7 @@ export default function ProjectsPage() {
                         max={formData.endDate}
                       />
                     </div>
-                    <div className="grid gap-2">
+                    <div className="grid ">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="edit-endDate">End Date</Label>
                         {formData.startDate && formData.endDate && (
@@ -1792,6 +1806,18 @@ export default function ProjectsPage() {
                         value={formData.endDate}
                         onChange={handleInputChange}
                         min={formData.startDate}
+                      />
+                    </div>
+
+                    <div className="grid ">
+                      <Label htmlFor="edit-actualDate">Start Date</Label>
+                      <Input
+                        id="edit-actualDate"
+                        name="actualDate"
+                        type="date"
+                        value={formData.actualDate}
+                        onChange={handleInputChange}
+                        max={formData.actualDate}
                       />
                     </div>
                   </div>
