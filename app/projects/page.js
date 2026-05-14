@@ -1124,11 +1124,14 @@ export default function ProjectsPage() {
                 </DialogDescription>
               </DialogHeader>
               <Tabs defaultValue="basic">
-                <TabsList className="grid w-full grid-cols-4">
+                {/* Fix: Changed grid-cols-4 to grid-cols-5 */}
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="basic">Basic Info</TabsTrigger>
                   <TabsTrigger value="budget">Budget</TabsTrigger>
                   <TabsTrigger value="client">Client</TabsTrigger>
                   <TabsTrigger value="details">Details</TabsTrigger>
+                  {/* Fix: Added 5th Tab Trigger */}
+                  <TabsTrigger value="allocation">Resources</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basic" className="space-y-4 mt-4">
@@ -1179,7 +1182,9 @@ export default function ProjectsPage() {
                     </div>
 
                     <div className="grid ">
-                      <Label htmlFor="actualDate">Actual Date</Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="actualDate">Actual Date</Label>
+                      </div>
                       <Input
                         id="actualDate"
                         name="actualDate"
@@ -1413,7 +1418,6 @@ export default function ProjectsPage() {
 
                 <TabsContent value="details" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-4">
-
                     <div className="grid gap-2">
                       <Label htmlFor="projectType">Project Type</Label>
                       <Select
@@ -1426,7 +1430,6 @@ export default function ProjectsPage() {
                           <SelectValue placeholder="Select project type" />
                         </SelectTrigger>
                         <SelectContent>
-                          {/* Dynamically render types from backend */}
                           {backendProjectTypes.map((type, i) => (
                             <SelectItem key={i} value={type._id || type}>
                               {type.typeName}
@@ -1437,7 +1440,19 @@ export default function ProjectsPage() {
                     </div>
                   </div>
                 </TabsContent>
+
+                {/* Fix: Added 5th Tab Content */}
+                <TabsContent value="allocation" className="space-y-4 mt-4">
+                  <div className="grid gap-4">
+                    <div className="rounded-md border border-dashed p-8 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Resource allocation fields will be added here.
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
               </Tabs>
+
               <DialogFooter className="mt-6">
                 <Button
                   variant="outline"
@@ -1466,11 +1481,14 @@ export default function ProjectsPage() {
                   </DialogHeader>
 
                   <Tabs defaultValue="overview">
-                    <TabsList className="grid w-full grid-cols-4">
+                    {/* Fix: Updated to grid-cols-5 to accommodate the new tab */}
+                    <TabsList className="grid w-full grid-cols-5">
                       <TabsTrigger value="overview">Overview</TabsTrigger>
                       <TabsTrigger value="budget">Budget</TabsTrigger>
                       <TabsTrigger value="client">Client</TabsTrigger>
                       <TabsTrigger value="details">Details</TabsTrigger>
+                      {/* Added Resources Tab Trigger */}
+                      <TabsTrigger value="allocation">Resources</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="overview" className="space-y-4 mt-4">
@@ -1702,14 +1720,6 @@ export default function ProjectsPage() {
 
                     <TabsContent value="details" className="space-y-4 mt-4">
                       <div className="grid grid-cols-2 gap-4">
-                        {/* <div>
-                          <h3 className="text-sm font-medium text-muted-foreground">
-                            Project Group
-                          </h3>
-                          <p className="mt-1">
-                            {currentProject.projectGroup || "N/A"}
-                          </p>
-                        </div> */}
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground">
                             Project Type
@@ -1739,6 +1749,15 @@ export default function ProjectsPage() {
                           {currentProject.updatedAt
                             ? formatDate(currentProject.updatedAt)
                             : "N/A"}
+                        </p>
+                      </div>
+                    </TabsContent>
+
+                    {/* Added Resources Tab Content */}
+                    <TabsContent value="allocation" className="space-y-4 mt-4">
+                      <div className="rounded-md border border-dashed p-8 text-center">
+                        <p className="text-sm text-muted-foreground">
+                          Resource allocation details will be displayed here.
                         </p>
                       </div>
                     </TabsContent>
@@ -1776,11 +1795,12 @@ export default function ProjectsPage() {
                 </DialogDescription>
               </DialogHeader>
               <Tabs defaultValue="basic">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="basic">Basic Info</TabsTrigger>
                   <TabsTrigger value="budget">Budget</TabsTrigger>
                   <TabsTrigger value="client">Client</TabsTrigger>
                   <TabsTrigger value="details">Details</TabsTrigger>
+                  <TabsTrigger value="allocation">Resources</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basic" className="space-y-4 mt-4">
@@ -2079,7 +2099,6 @@ export default function ProjectsPage() {
                           <SelectValue placeholder="Select project type" />
                         </SelectTrigger>
                         <SelectContent>
-                          {/* Dynamically render types from backend */}
                           {backendProjectTypes.map((type, i) => (
                             <SelectItem key={i} value={type._id || type}>
                               {type.typeName || type}
@@ -2088,6 +2107,14 @@ export default function ProjectsPage() {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="allocation" className="space-y-4 mt-4">
+                  <div className="rounded-md border border-dashed p-8 text-center bg-slate-50/50">
+                    <p className="text-sm text-muted-foreground">
+                      Resource allocation management will be displayed here.
+                    </p>
                   </div>
                 </TabsContent>
               </Tabs>
