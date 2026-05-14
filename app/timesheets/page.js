@@ -58,9 +58,14 @@ import api from "@/config/api";
 const ITEMS_PER_PAGE = 10;
 
 export default function TimesheetPage() {
-  const { user } = useAuth();
+  const { user, hasPermission } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+
+  // Permission Checks
+  const canCreate = hasPermission("create_timesheets");
+  const canEdit = hasPermission("edit_timesheets");
+  const canDelete = hasPermission("delete_timesheets");
 
   // Data states
   const [timesheets, setTimesheets] = useState([]);
@@ -75,7 +80,7 @@ export default function TimesheetPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [projectFilter, setProjectFilter] = useState("all");
 
-  // Pagination State (Added Fix)
+  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
 
   const [formData, setFormData] = useState({
@@ -160,7 +165,7 @@ export default function TimesheetPage() {
     });
   }, [timesheets, searchTerm, projectFilter]);
 
-  // Pagination Logic (Added Fix)
+  // Pagination Logic
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -203,6 +208,7 @@ export default function TimesheetPage() {
   };
 
   const handleDeleteTimesheet = async (id) => {
+    if (!canDelete) return; // Permission safety check
     if (!confirm("Are you sure you want to delete this log?")) return;
     try {
       setLoading(true);
@@ -269,7 +275,6 @@ export default function TimesheetPage() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search logs..."
-                  // bg-background ensures it turns dark when the system theme is dark
                   className="pl-8 w-full sm:w-[250px] bg-background text-[13px]"
                   value={searchTerm}
                   onChange={(e) => {
@@ -283,16 +288,18 @@ export default function TimesheetPage() {
                   variant="outline"
                   onClick={exportToCSV}
                   disabled={filteredData.length === 0}
-                  className="text-[13px] bg-background" // Added bg-background for consistency
+                  className="text-[13px] bg-background"
                 >
                   <FileText className="mr-2 h-4 w-4" /> Export
                 </Button>
-                <Button
-                  onClick={handleOpenNew}
-                  className="text-[13px]" // Removed custom colors; defaults to primary (Dark/Light adaptive)
-                >
-                  <Plus className="mr-2 h-4 w-4" /> Log Time
-                </Button>
+                {canCreate && (
+                  <Button
+                    onClick={handleOpenNew}
+                    className="text-[13px]"
+                  >
+                    <Plus className="mr-2 h-4 w-4" /> Log Time
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -321,7 +328,6 @@ export default function TimesheetPage() {
             )}
           </div>
 
-          {/* Updated Table Card for Dark Mode Theme Fixes */}
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
             <Table>
               <TableHeader className="bg-muted/50">
@@ -331,7 +337,7 @@ export default function TimesheetPage() {
                   <TableHead className="text-xs font-bold uppercase">Work Item</TableHead>
                   <TableHead className="text-xs font-bold uppercase">Description</TableHead>
                   <TableHead className="w-[100px] text-xs font-bold uppercase text-center">Hours</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="w-[100px] text-xs font-bold uppercase text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -347,7 +353,8 @@ export default function TimesheetPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="text-[13px] font-semibold text-foreground">{ts.projectId?.name || "N/A"}</span>                          <span className="text-[11px] text-muted-foreground">{ts.milestoneId?.name || "General"}</span>
+                          <span className="text-[13px] font-semibold text-foreground">{ts.projectId?.name || "N/A"}</span>
+                          <span className="text-[11px] text-muted-foreground">{ts.milestoneId?.name || "General"}</span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -369,18 +376,22 @@ export default function TimesheetPage() {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-8 w-8  transition-opacity">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-[140px]">
-                            <DropdownMenuItem onClick={() => handleEdit(ts)} className="cursor-pointer text-sm">
-                              <Pencil className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer text-sm">
-                              <Trash className="mr-2 h-4 w-4" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
+                          {(canEdit || canDelete) && <DropdownMenuContent align="end" className="w-[140px]">
+                            {canEdit && (
+                              <DropdownMenuItem onClick={() => handleEdit(ts)} className="cursor-pointer text-sm">
+                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                              </DropdownMenuItem>
+                            )}
+                            {canDelete && (
+                              <DropdownMenuItem onClick={() => handleDeleteTimesheet(ts._id)} className="text-red-600 cursor-pointer text-sm">
+                                <Trash className="mr-2 h-4 w-4" /> Delete
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>}
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
@@ -389,7 +400,6 @@ export default function TimesheetPage() {
             </Table>
           </div>
 
-          {/* Pagination Footer (Added Fix to match ProjectsPage) */}
           <div className="flex items-center justify-between px-2 py-4">
             <div className="text-sm text-muted-foreground">
               Showing <strong>{Math.min(filteredData.length, (currentPage - 1) * ITEMS_PER_PAGE + 1)}</strong> to <strong>{Math.min(filteredData.length, currentPage * ITEMS_PER_PAGE)}</strong> of <strong>{filteredData.length}</strong> entries
@@ -418,7 +428,6 @@ export default function TimesheetPage() {
           </div>
         </div>
 
-        {/* Dialog for entry - Theme Fix Applied */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="sm:max-w-[520px] p-0 border-none shadow-2xl rounded-xl overflow-hidden bg-background">
             <DialogHeader className="px-5 py-3 border-b bg-muted/20">

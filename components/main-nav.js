@@ -81,13 +81,13 @@ export function MainNav({ closeSidebar }) {
       title: "Timesheets",
       href: "/timesheets",
       icon: CalendarClock,
-      permission: null,
+      permission: "view_timesheets",
     },
     {
       title: "Reports",
       href: "/reports",
       icon: FileText,
-      permission: null,
+      permission: "access_reports",
     },
     {
       title: "Sprints",

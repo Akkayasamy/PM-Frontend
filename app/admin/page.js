@@ -115,11 +115,18 @@ export default function AdminPage() {
 
   // All available permissions in the system
   const allPermissions = {
+    teams: ["view_team_members", "create_teams", "edit_teams", "delete_teams"],
     projects: [
       "view_projects",
       "create_projects",
       "edit_projects",
       "delete_projects",
+    ],
+    milestones: [
+      "view_milestones",
+      "create_milestones",
+      "edit_milestones",
+      "delete_milestones",
     ],
     tasks: [
       "view_tasks",
@@ -128,6 +135,15 @@ export default function AdminPage() {
       "delete_tasks",
       "assign_tasks",
       "update_task_status",
+    ],
+    timesheets: [
+      "view_timesheets",
+      "create_timesheets",
+      "edit_timesheets",
+      "delete_timesheets",
+    ],
+    reports: [
+      "access_reports",
     ],
     consultants: [
       "view_consultants",
@@ -141,7 +157,6 @@ export default function AdminPage() {
       "edit_clients",
       "delete_clients",
     ],
-    teams: ["view_team_members", "create_teams", "edit_teams", "delete_teams"],
     resources: ["view_resources", "assign_resources"],
     issues: [
       "view_issues",
@@ -149,12 +164,6 @@ export default function AdminPage() {
       "edit_issues",
       "resolve_issues",
       "update_issue_status",
-    ],
-    milestones: [
-      "view_milestones",
-      "create_milestones",
-      "edit_milestones",
-      "delete_milestones",
     ],
   };
 
