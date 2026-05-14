@@ -106,6 +106,8 @@ export default function TasksPage() {
     billable: true,
     attachments: [],
     active: true,
+    planDate: "",
+    actualDate: ""
   });
 
   // Search and filter state
@@ -346,6 +348,8 @@ export default function TasksPage() {
       billable: true,
       attachments: [],
       active: true,
+      planDate: "",
+      actualDate: ""
     });
     setCurrentTaskId(null);
     setUploadStatuses(Array(5).fill(null));
@@ -415,6 +419,8 @@ export default function TasksPage() {
       billable: task.billable !== undefined ? task.billable : true,
       attachments: task.attachments || [],
       active: task.active !== undefined ? task.active : true,
+      planDate: task?.planDate,
+      actualDate: task?.actualDate
     });
     setIsEditDialogOpen(true);
   };
@@ -1623,6 +1629,29 @@ export default function TasksPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
+                      <Label htmlFor="planDate">Plan Date</Label>
+                      <Input
+                        id="planDate"
+                        name="planDate"
+                        type="date"
+                        value={formData.planDate}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="actualDate">Actual Date</Label>
+                      <Input
+                        id="actualDate"
+                        name="actualDate"
+                        type="date"
+                        value={formData.actualDate}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
                       <Label htmlFor="estimatedHours">Estimated Hours</Label>
                       <Input
                         id="estimatedHours"
@@ -2029,6 +2058,30 @@ export default function TasksPage() {
                         name="endDate"
                         type="date"
                         value={formData.endDate}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                  </div>
+
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-planDate">Plan Date</Label>
+                      <Input
+                        id="edit-planDate"
+                        name="planDate"
+                        type="date"
+                        value={formData.planDate}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-actualDate">Actual Date</Label>
+                      <Input
+                        id="edit-actualDate"
+                        name="actualDate"
+                        type="date"
+                        value={formData.actualDate}
                         onChange={handleInputChange}
                       />
                     </div>
