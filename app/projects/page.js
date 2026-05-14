@@ -110,7 +110,8 @@ export default function ProjectsPage() {
     description: "",
     status: "not_started",
     managerId: "",
-    actualDate: ""
+    actualDate: "",
+    teamleadId: ""
   });
 
 
@@ -183,6 +184,7 @@ export default function ProjectsPage() {
   }, []);
 
   const projectManagers = users.filter((u) => u.role === "project_manager");
+  const teamLeads = users.filter((u) => u.role === "team_leadar");
 
   useEffect(() => {
     const loadResponse = async () => {
@@ -370,7 +372,8 @@ export default function ProjectsPage() {
       description: "",
       status: "planning",
       managerId: "",
-      actualDate: ""
+      actualDate: "",
+      teamleadId: ""
     });
     setCurrentProject(null);
   };
@@ -483,7 +486,8 @@ export default function ProjectsPage() {
       description: project.description || "",
       status: project.status || "planning",
       managerId: project.managerId || "",
-      actualDate: project.actualDate || ""
+      actualDate: project.actualDate || "",
+      teamleadId: project.teamleadId || ""
     });
     setIsEditDialogOpen(true);
   };
@@ -1197,30 +1201,7 @@ export default function ProjectsPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="status">Status</Label>
-                      <Select
-                        value={formData.status}
-                        onValueChange={(value) =>
-                          handleSelectChange("status", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="not_started">
-                            Not Started
-                          </SelectItem>
-                          <SelectItem value="in_progress">
-                            In Progress
-                          </SelectItem>
-                          <SelectItem value="on_hold">On Hold</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+
                     <div className="grid gap-2">
                       <Label htmlFor="managerId">Project Manager</Label>
                       <Select
@@ -1241,6 +1222,52 @@ export default function ProjectsPage() {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="teamleadId">Team Leader</Label>
+                      <Select
+                        value={formData.teamleadId}
+                        onValueChange={(value) =>
+                          handleSelectChange("teamleadId", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a manager" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teamLeads.map((tl) => (
+                            <SelectItem key={tl._id} value={tl?._id}>
+                              {tl.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) =>
+                        handleSelectChange("status", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not_started">
+                          Not Started
+                        </SelectItem>
+                        <SelectItem value="in_progress">
+                          In Progress
+                        </SelectItem>
+                        <SelectItem value="on_hold">On Hold</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="grid gap-2">
@@ -1864,30 +1891,7 @@ export default function ProjectsPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="edit-status">Status</Label>
-                      <Select
-                        value={formData.status}
-                        onValueChange={(value) =>
-                          handleSelectChange("status", value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="not_started">
-                            Not Started
-                          </SelectItem>
-                          <SelectItem value="in_progress">
-                            In Progress
-                          </SelectItem>
-                          <SelectItem value="on_hold">On Hold</SelectItem>
-                          <SelectItem value="completed">Completed</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+
                     <div className="grid gap-2">
                       <Label htmlFor="edit-managerId">Project Manager</Label>
                       <Select
@@ -1908,6 +1912,53 @@ export default function ProjectsPage() {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="edit-teamleadId">Team Leader</Label>
+                      <Select
+                        value={formData.teamleadId}
+                        onValueChange={(value) =>
+                          handleSelectChange("teamleadId", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a team lead" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teamLeads.map((tl, i) => (
+                            <SelectItem key={i} value={tl._id}>
+                              {tl.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) =>
+                        handleSelectChange("status", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="not_started">
+                          Not Started
+                        </SelectItem>
+                        <SelectItem value="in_progress">
+                          In Progress
+                        </SelectItem>
+                        <SelectItem value="on_hold">On Hold</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="grid gap-2">
