@@ -165,6 +165,9 @@ export default function AdminPage() {
       "resolve_issues",
       "update_issue_status",
     ],
+    overview: [
+      "over_view",
+    ],
   };
 
   useEffect(() => {

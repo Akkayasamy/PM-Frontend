@@ -44,7 +44,7 @@ export function MainNav({ closeSidebar }) {
       title: "Overview",
       href: "/overview",
       icon: GitGraph,
-      permission: null,
+      permission: "over_view",
     },
     {
       title: "Users",
