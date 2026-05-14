@@ -124,6 +124,7 @@ export default function ProjectsPage() {
   const [users, setUsers] = useState([]);
   const [clients, setClients] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [backendProjectTypes, setBackendProjectTypes] = useState([]); // New state for backend types
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -153,6 +154,19 @@ export default function ProjectsPage() {
     },
     { id: "cancelled", title: "Cancelled", color: "bg-red-50 border-red-200" },
   ];
+
+  useEffect(() => {
+    const fetchProjectTypes = async () => {
+      try {
+        const response = await api.get("projecttype");
+        // Ensure we handle the structure correctly (expecting an array)
+        setBackendProjectTypes(response.data.projectTypes || response.data || []);
+      } catch (err) {
+        console.error("Error fetching project types:", err);
+      }
+    };
+    fetchProjectTypes();
+  }, []);
 
   useEffect(() => {
     const loadResponse = async () => {
@@ -204,11 +218,6 @@ export default function ProjectsPage() {
     loadResponse();
   }, []);
 
-  // Get unique project types for filter
-  const projectTypes = [
-    ...new Set(projects.map((project) => project.projectType).filter(Boolean)),
-  ];
-
   // Filter and sort projects
   useEffect(() => {
     let result = [...projects];
@@ -243,7 +252,7 @@ export default function ProjectsPage() {
     // Apply project type filter
     if (projectTypeFilter !== "all") {
       result = result.filter(
-        (project) => project.projectType === projectTypeFilter
+        (project) => project.projectType?._id === projectTypeFilter
       );
     }
 
@@ -311,7 +320,6 @@ export default function ProjectsPage() {
     if (clientId === "none") {
       setFormData((prev) => ({
         ...prev,
-        clientId: "none",
         clientId: "",
         clientName: "",
       }));
@@ -325,13 +333,11 @@ export default function ProjectsPage() {
       setFormData((prev) => ({
         ...prev,
         clientId: clientId,
-        clientId: selectedClient.clientId || "",
         clientName: selectedClient.name || "",
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        clientId: "none",
         clientId: "",
         clientName: "",
       }));
@@ -470,7 +476,7 @@ export default function ProjectsPage() {
       clientSPOC2: project.clientSPOC2 || "",
       clientSPOC2Email: project.clientSPOC2Email || "",
       projectGroup: project.projectGroup || "",
-      projectType: project.projectType || "",
+      projectType: project.projectType?._id?.toString() || "",
       description: project.description || "",
       status: project.status || "planning",
       managerId: project.managerId || "",
@@ -653,7 +659,7 @@ export default function ProjectsPage() {
 
           {project.projectType && (
             <div className="text-xs text-muted-foreground">
-              📋 {project.projectType}
+              📋 {project.projectType?._id}
             </div>
           )}
 
@@ -714,7 +720,11 @@ export default function ProjectsPage() {
                 />
               </div>
               {canCreate && (
-                <Button onClick={() => setIsCreateDialogOpen(true)}>
+                <Button onClick={() => {
+                  resetForm(),
+                    setIsCreateDialogOpen(true)
+                }
+                }>
                   <Plus className="mr-2 h-4 w-4" />
                   Add Project
                 </Button>
@@ -784,9 +794,10 @@ export default function ProjectsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                {projectTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
+                {/* Dynamically render types from backend */}
+                {backendProjectTypes.map((type, i) => (
+                  <SelectItem key={i} value={type._id}>
+                    {type.typeName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -928,9 +939,9 @@ export default function ProjectsPage() {
                             <div className="flex flex-col">
                               <span>{project.name}</span>
 
-                              {project.projectType && (
+                              {project.projectType?.typeName && (
                                 <span className="text-xs text-muted-foreground">
-                                  {project.projectType}
+                                  {project.projectType?.typeName}
                                 </span>
                               )}
                             </div>
@@ -1367,25 +1378,7 @@ export default function ProjectsPage() {
 
                 <TabsContent value="details" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="projectGroup">Project Group</Label>
-                      <Select
-                        value={formData.projectGroup}
-                        onValueChange={(value) =>
-                          handleSelectChange("projectGroup", value)
-                        }
-                      >
-                        <SelectTrigger id="projectGroup">
-                          <SelectValue placeholder="Select project group" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="SAP">SAP</SelectItem>
-                          <SelectItem value="NetSuite">NetSuite</SelectItem>
-                          <SelectItem value="Odoo">Odoo</SelectItem>
-                          <SelectItem value="Mobile APP">Mobile APP</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+
                     <div className="grid gap-2">
                       <Label htmlFor="projectType">Project Type</Label>
                       <Select
@@ -1398,30 +1391,12 @@ export default function ProjectsPage() {
                           <SelectValue placeholder="Select project type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="SAP Implementation">
-                            SAP Implementation
-                          </SelectItem>
-                          <SelectItem value="NetSuite Implementation">
-                            NetSuite Implementation
-                          </SelectItem>
-                          <SelectItem value="NetSuite Support">
-                            NetSuite Support
-                          </SelectItem>
-                          <SelectItem value="SAP Support">
-                            SAP Support
-                          </SelectItem>
-                          <SelectItem value="Odoo Implementation">
-                            Odoo Implementation
-                          </SelectItem>
-                          <SelectItem value="Odoo Support">
-                            Odoo Support
-                          </SelectItem>
-                          <SelectItem value="Mobile APP Development">
-                            Mobile APP Development
-                          </SelectItem>
-                          <SelectItem value="Integration">
-                            Integration
-                          </SelectItem>
+                          {/* Dynamically render types from backend */}
+                          {backendProjectTypes.map((type, i) => (
+                            <SelectItem key={i} value={type._id || type}>
+                              {type.typeName}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -2046,25 +2021,6 @@ export default function ProjectsPage() {
                 <TabsContent value="details" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label htmlFor="projectGroup">Project Group</Label>
-                      <Select
-                        value={formData.projectGroup}
-                        onValueChange={(value) =>
-                          handleSelectChange("projectGroup", value)
-                        }
-                      >
-                        <SelectTrigger id="projectGroup">
-                          <SelectValue placeholder="Select project group" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="SAP">SAP</SelectItem>
-                          <SelectItem value="NetSuite">NetSuite</SelectItem>
-                          <SelectItem value="Odoo">Odoo</SelectItem>
-                          <SelectItem value="Mobile APP">Mobile APP</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
                       <Label htmlFor="projectType">Project Type</Label>
                       <Select
                         value={formData.projectType}
@@ -2076,30 +2032,12 @@ export default function ProjectsPage() {
                           <SelectValue placeholder="Select project type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="SAP Implementation">
-                            SAP Implementation
-                          </SelectItem>
-                          <SelectItem value="NetSuite Implementation">
-                            NetSuite Implementation
-                          </SelectItem>
-                          <SelectItem value="NetSuite Support">
-                            NetSuite Support
-                          </SelectItem>
-                          <SelectItem value="SAP Support">
-                            SAP Support
-                          </SelectItem>
-                          <SelectItem value="Odoo Implementation">
-                            Odoo Implementation
-                          </SelectItem>
-                          <SelectItem value="Odoo Support">
-                            Odoo Support
-                          </SelectItem>
-                          <SelectItem value="Mobile APP Development">
-                            Mobile APP Development
-                          </SelectItem>
-                          <SelectItem value="Integration">
-                            Integration
-                          </SelectItem>
+                          {/* Dynamically render types from backend */}
+                          {backendProjectTypes.map((type, i) => (
+                            <SelectItem key={i} value={type._id || type}>
+                              {type.typeName || type}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
