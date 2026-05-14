@@ -111,7 +111,8 @@ export default function ProjectsPage() {
     status: "not_started",
     managerId: "",
     actualDate: "",
-    teamleadId: ""
+    teamleadId: "",
+    resources: [],
   });
 
 
@@ -373,7 +374,8 @@ export default function ProjectsPage() {
       status: "planning",
       managerId: "",
       actualDate: "",
-      teamleadId: ""
+      teamleadId: "",
+      resources: [],
     });
     setCurrentProject(null);
   };
@@ -487,7 +489,8 @@ export default function ProjectsPage() {
       status: project.status || "planning",
       managerId: project.managerId || "",
       actualDate: project.actualDate || "",
-      teamleadId: project.teamleadId || ""
+      teamleadId: project.teamleadId || "",
+      resources: project.resources || [],
     });
     setIsEditDialogOpen(true);
   };
@@ -578,6 +581,141 @@ export default function ProjectsPage() {
     if (diffDays === 1) return "1 day";
     return `${diffDays} days`;
   }
+
+
+
+  const handleAddProjectMember = (memberId) => {
+    if (!formData.resources?.includes(memberId)) {
+      setFormData((prev) => ({
+        ...prev,
+        resources: [...(prev.resources || []), memberId],
+      }));
+    }
+  };
+
+  const handleRemoveProjectMember = (memberId) => {
+    setFormData((prev) => ({
+      ...prev,
+      resources: (prev.resources || []).filter((id) => id !== memberId),
+    }));
+  };
+
+  const handleProjectMemberSelect = (value) => {
+    if (value && !(formData.resources || []).includes(value)) {
+      setFormData((prev) => ({
+        ...prev,
+        resources: [...(prev.resources || []), value],
+      }));
+    }
+  };
+
+  // ─── UPDATED Resources Tab ───────────────────────────────────────
+
+  const ResourcesTabForm = ({ isViewOnly }) => {
+    const availableMembers = users.filter(
+      (u) =>
+        u.role === "team_member" ||
+        u.role === "project_manager" ||
+        u.role === "team_leadar"
+    );
+    console.log(formData.resources, '<<<<<<')
+
+    if (isViewOnly) {
+      return (
+        <>
+          <h3 className="text-sm font-medium text-muted-foreground">
+            Team Members
+          </h3>
+          {!currentProject?.resources || currentProject?.resources?.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No members added yet
+            </p>
+          ) : (
+            currentProject?.resources?.map((memberId, i) => {
+              const member = users.find((u) => u._id === memberId);
+
+              return member ? (
+                <Badge
+                  key={i}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {member.name}
+                </Badge>
+              ) : null;
+            })
+          )}
+        </>
+      )
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Current Members */}
+        <div className="grid gap-2">
+          <Label>Current Team Members</Label>
+
+          <div className="flex flex-wrap gap-2 p-3 border rounded-md min-h-[60px]">
+            {!formData.resources || formData.resources.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No members added yet
+              </p>
+            ) : (
+              formData.resources.map((memberId, i) => {
+                const member = users.find((u) => u._id === memberId);
+
+                return member ? (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {member.name}
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 ml-1"
+                      onClick={() =>
+                        handleRemoveProjectMember(memberId)
+                      }
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
+                ) : null;
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Add Member */}
+        <div className="grid gap-2">
+          <Label htmlFor="add-member">Add Team Member</Label>
+
+          <Select onValueChange={handleProjectMemberSelect}>
+            <SelectTrigger id="add-member">
+              <SelectValue placeholder="Select a team member" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {availableMembers
+                .filter(
+                  (member) =>
+                    !(formData.resources || []).includes(member._id)
+                )
+                .map((member, i) => (
+                  <SelectItem key={i} value={member._id}>
+                    {member.name}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    );
+  };
 
   // Kanban Project Card Component
   const ProjectCard = ({ project }) => (
@@ -1470,13 +1608,7 @@ export default function ProjectsPage() {
 
                 {/* Fix: Added 5th Tab Content */}
                 <TabsContent value="allocation" className="space-y-4 mt-4">
-                  <div className="grid gap-4">
-                    <div className="rounded-md border border-dashed p-8 text-center">
-                      <p className="text-sm text-muted-foreground">
-                        Resource allocation fields will be added here.
-                      </p>
-                    </div>
-                  </div>
+                  <ResourcesTabForm />
                 </TabsContent>
               </Tabs>
 
@@ -1782,11 +1914,7 @@ export default function ProjectsPage() {
 
                     {/* Added Resources Tab Content */}
                     <TabsContent value="allocation" className="space-y-4 mt-4">
-                      <div className="rounded-md border border-dashed p-8 text-center">
-                        <p className="text-sm text-muted-foreground">
-                          Resource allocation details will be displayed here.
-                        </p>
-                      </div>
+                      <ResourcesTabForm isViewOnly={true} />
                     </TabsContent>
                   </Tabs>
 
@@ -2162,11 +2290,7 @@ export default function ProjectsPage() {
                 </TabsContent>
 
                 <TabsContent value="allocation" className="space-y-4 mt-4">
-                  <div className="rounded-md border border-dashed p-8 text-center bg-slate-50/50">
-                    <p className="text-sm text-muted-foreground">
-                      Resource allocation management will be displayed here.
-                    </p>
-                  </div>
+                  <ResourcesTabForm />
                 </TabsContent>
               </Tabs>
               <DialogFooter className="mt-6">
