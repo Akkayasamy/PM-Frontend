@@ -185,7 +185,7 @@ export default function ProjectsPage() {
   }, []);
 
   const projectManagers = users.filter((u) => u.role === "project_manager");
-  const teamLeads = users.filter((u) => u.role === "team_leadar");
+  const teamLeads = users.filter((u) => u.role === "team_leader");
 
   useEffect(() => {
     const loadResponse = async () => {
@@ -612,6 +612,7 @@ export default function ProjectsPage() {
   // ─── UPDATED Resources Tab ───────────────────────────────────────
 
   const ResourcesTabForm = ({ isViewOnly }) => {
+
     const availableMembers = users.filter(
       (u) =>
         u.role === "team_member" ||

@@ -106,9 +106,11 @@ export default function TeamsPage() {
   //const teams = getItems("teams");
   const projects = getItems("projects");
   //const users = getItems("users");
-  const teamMembers = users.filter(
-    (u) => u.role === "team_member" || u.role === "project_manager"
-  );
+  const teamMembers = users.filter((u) => u.role === "team_member");
+
+  const teamLead = users.filter((u) => u.role === "team_leader");
+
+  const teamManager = users.filter((u) => u.role === "project_manager");
 
   useEffect(() => {
     const loadResponse = async () => {
@@ -406,7 +408,7 @@ export default function TeamsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Leads</SelectItem>
-                {teamMembers.map((member, i) => (
+                {teamLead.map((member, i) => (
                   <SelectItem key={i} value={member._id}>
                     {member.name}
                   </SelectItem>
@@ -676,7 +678,7 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a team lead" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member, i) => (
+                            {teamLead.map((member, i) => (
                               <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
@@ -698,7 +700,7 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a delivery manager" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member, i) => (
+                            {teamManager.map((member, i) => (
                               <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
@@ -840,7 +842,7 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a team lead" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member, i) => (
+                            {teamLead.map((member, i) => (
                               <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
@@ -862,7 +864,7 @@ export default function TeamsPage() {
                             <SelectValue placeholder="Select a delivery manager" />
                           </SelectTrigger>
                           <SelectContent>
-                            {teamMembers.map((member, i) => (
+                            {teamManager.map((member, i) => (
                               <SelectItem key={i} value={member._id}>
                                 {member.name}
                               </SelectItem>
