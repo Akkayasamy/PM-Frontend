@@ -107,7 +107,8 @@ export default function TasksPage() {
     attachments: [],
     active: true,
     planDate: "",
-    actualDate: ""
+    actualDate: "",
+    taskremarks: ""
   });
 
   // Search and filter state
@@ -349,7 +350,8 @@ export default function TasksPage() {
       attachments: [],
       active: true,
       planDate: "",
-      actualDate: ""
+      actualDate: "",
+      taskremarks: ""
     });
     setCurrentTaskId(null);
     setUploadStatuses(Array(5).fill(null));
@@ -420,7 +422,8 @@ export default function TasksPage() {
       attachments: task.attachments || [],
       active: task.active !== undefined ? task.active : true,
       planDate: task?.planDate,
-      actualDate: task?.actualDate
+      actualDate: task?.actualDate,
+      taskremarks: task?.taskremarks || ""
     });
     setIsEditDialogOpen(true);
   };
@@ -1451,8 +1454,8 @@ export default function TasksPage() {
                           <SelectValue placeholder="Select a project" />
                         </SelectTrigger>
                         <SelectContent>
-                          {projects.map((project) => (
-                            <SelectItem key={project.id} value={project._id}>
+                          {projects.map((project, i) => (
+                            <SelectItem key={i} value={project._id}>
                               {project.name}
                             </SelectItem>
                           ))}
@@ -1671,6 +1674,17 @@ export default function TasksPage() {
                         onChange={handleInputChange}
                       />
                     </div>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="taskremarks">Task Remarks</Label>
+                    <Textarea
+                      id="taskremarks"
+                      name="taskremarks"
+                      value={formData.taskremarks}
+                      onChange={handleInputChange}
+                      rows={3}
+                    />
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -2110,6 +2124,18 @@ export default function TasksPage() {
                         onChange={handleInputChange}
                       />
                     </div>
+                  </div>
+
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="edit-taskremarks">Task Remarks</Label>
+                    <Textarea
+                      id="edit-taskremarks"
+                      name="taskremarks"
+                      value={formData.taskremarks}
+                      onChange={handleInputChange}
+                      rows={3}
+                    />
                   </div>
 
                   <div className="flex items-center space-x-2">
