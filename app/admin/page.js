@@ -71,6 +71,12 @@ import { useToast } from "@/hooks/use-toast";
 import { toastMessages } from "@/lib/utils";
 import api from "@/config/api";
 
+// Common country list for the dropdown
+const countries = [
+  "United States", "United Kingdom", "India", "Canada", "Australia",
+  "Germany", "France", "United Arab Emirates", "Singapore", "Japan"
+];
+
 export default function AdminPage() {
   const { hasPermission } = useAuth();
   const { getItems, createItem, updateItem, deleteItem } = useData();
@@ -189,11 +195,6 @@ export default function AdminPage() {
       return;
     }
 
-    // const fetchedUsers = getItems("users");
-    // const fetchedRoles = getItems("roles");
-    // setUsers(fetchedUsers);
-    // setRoles(fetchedRoles);
-
     const loadResponse = async () => {
       try {
         const response = await api.get("users");
@@ -295,13 +296,11 @@ export default function AdminPage() {
 
   // User CRUD operations
   const openEditUserDialog = (user) => {
-    // const user = users.find((user) => user.id === id);
     setCurrentUser(user);
     setIsEditUserDialogOpen(true);
   };
 
   const openViewUserDialog = (user) => {
-    //const user = users.find((user) => user.id === id);
     setCurrentUser(user);
     setIsViewUserDialogOpen(true);
   };
@@ -312,6 +311,11 @@ export default function AdminPage() {
       email: "",
       role: "team_member",
       password: "",
+      phoneNumber: "",
+      country: "",
+      designation: "",
+      monthlySalary: "",
+      perHourBudget: "",
     });
     setIsCreateUserDialogOpen(true);
   };
@@ -332,23 +336,13 @@ export default function AdminPage() {
 
     try {
       if (currentUser._id) {
-        // Update existing user
         const response = await api.put("user", currentUser);
         setSuccess(response);
-        // updateItem("users", currentUser.id, currentUser);
-        // setUsers(
-        //   users.map((user) => (user.id === currentUser.id ? currentUser : user))
-        // );
         toast(toastMessages.update("User", currentUser.name));
       } else {
         const response = await api.post("register", currentUser);
         setSuccess(response);
         toast(toastMessages.create("User", currentUser.name));
-        // // Create new user
-        // createItem("users", currentUser);
-        // // Refresh users from data context
-        // setUsers(getItems("users"));
-        // toast(toastMessages.create("User", currentUser.name));
       }
 
       setIsEditUserDialogOpen(false);
@@ -377,13 +371,8 @@ export default function AdminPage() {
 
     try {
       if (currentUser._id) {
-        // Update existing user
         const response = await api.put("user", currentUser);
         setSuccess(response);
-        // updateItem("users", currentUser.id, currentUser);
-        // setUsers(
-        //   users.map((user) => (user.id === currentUser.id ? currentUser : user))
-        // );
         toast(toastMessages.update("User", currentUser.name));
       }
       setIsEditUserDialogOpen(false);
@@ -401,13 +390,10 @@ export default function AdminPage() {
   };
 
   const handleDeleteUser = async (user) => {
-    // const userToDelete = users.find((user) => user.id === id);
     if (
       window.confirm(`Are you sure you want to delete the user "${user.name}"?`)
     ) {
       try {
-        // deleteItem("users", id);
-        // setUsers(users.filter((user) => user.id !== id));
         const response = await api.delete(`user/${user._id}`);
         setSuccess(response);
         toast(toastMessages.delete("User", user.name));
@@ -422,13 +408,11 @@ export default function AdminPage() {
 
   // Role CRUD operations
   const openEditRoleDialog = (role) => {
-    // const role = roles.find((role) => role.id === id);
     setCurrentRole(role);
     setIsEditRoleDialogOpen(true);
   };
 
   const openViewRoleDialog = (role) => {
-    // const role = roles.find((role) => role.id === id);
     setCurrentRole(role);
     setIsViewRoleDialogOpen(true);
   };
@@ -443,7 +427,6 @@ export default function AdminPage() {
   };
 
   const handleSaveRole = async () => {
-    console.log(currentRole);
     if (!currentRole.name.trim()) {
       toast({
         title: "Validation Error",
@@ -454,23 +437,10 @@ export default function AdminPage() {
     }
     try {
       if (currentRole._id) {
-        // Update existing role
-        // updateItem("roles", currentRole.id, currentRole);
-        // setRoles(
-        //   roles.map((role) => (role.id === currentRole.id ? currentRole : role))
-        // );
         const response = await api.put("role", currentRole);
         setSuccess(response);
         toast(toastMessages.update("Role", currentRole.name));
       } else {
-        // // Create new role
-        // const newRole = {
-        //   ...currentRole,
-        //   createdAt: new Date().toISOString(),
-        // };
-        // createItem("roles", newRole);
-        // // Refresh roles from data context
-        // setRoles(getItems("roles"));
         const response = await api.post("role", currentRole);
         setSuccess(response);
         toast(toastMessages.create("Role", currentRole.name));
@@ -487,13 +457,10 @@ export default function AdminPage() {
   };
 
   const handleDeleteRole = async (role) => {
-    // const roleToDelete = roles.find((role) => role.id === id);
     if (
       window.confirm(`Are you sure you want to delete the role "${role.name}"?`)
     ) {
       try {
-        // deleteItem("roles", id);
-        // setRoles(roles.filter((role) => role.id !== id));
         const response = await api.delete(`role/${role.roleId}`);
         setSuccess(response);
         toast(toastMessages.delete("Role", role.name));
@@ -606,7 +573,6 @@ export default function AdminPage() {
     return role;
   };
 
-  // Get role badge color
   const getRoleBadgeColor = (role) => {
     switch (role) {
       case "admin":
@@ -623,22 +589,17 @@ export default function AdminPage() {
     }
   };
 
-  // Count users with a specific role
   const countUsersWithRole = (roleId) => {
     if (roleId === undefined) return 0;
-
-    const roleString = `custom_${roleId}`;
     return users.filter((user) => user.role === roleId).length;
   };
 
-  // Pagination for users
   const userTotalPages = Math.ceil(filteredUsers.length / USER_ITEMS_PER_PAGE);
   const paginatedUsers = filteredUsers.slice(
     (userCurrentPage - 1) * USER_ITEMS_PER_PAGE,
     userCurrentPage * USER_ITEMS_PER_PAGE
   );
 
-  // Pagination for roles
   const roleTotalPages = Math.ceil(filteredRoles.length / ROLE_ITEMS_PER_PAGE);
   const paginatedRoles = filteredRoles.slice(
     (roleCurrentPage - 1) * ROLE_ITEMS_PER_PAGE,
@@ -657,7 +618,6 @@ export default function AdminPage() {
             <TabsList className="mb-4">
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="roles">Roles</TabsTrigger>
-              {/* <TabsTrigger value="system">System</TabsTrigger> */}
             </TabsList>
 
             {/* Users Tab */}
@@ -892,7 +852,7 @@ export default function AdminPage() {
                   open={isCreateUserDialogOpen}
                   onOpenChange={setIsCreateUserDialogOpen}
                 >
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Create New User</DialogTitle>
                       <DialogDescription>
@@ -900,76 +860,162 @@ export default function AdminPage() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="name">Name</Label>
+                          <Input
+                            id="name"
+                            value={currentUser?.name || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                name: e.target.value,
+                              })
+                            }
+                            placeholder="Enter full name"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={currentUser?.email || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                email: e.target.value,
+                              })
+                            }
+                            placeholder="Enter email address"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="role">Role</Label>
+                          <Select
+                            value={currentUser?.role || "team_member"}
+                            onValueChange={(value) =>
+                              setCurrentUser({ ...currentUser, role: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="admin">Admin</SelectItem>
+                              {roles.map((role) => (
+                                <SelectItem key={role._id} value={`${role.name}`}>
+                                  {role.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="password">Password</Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            value={currentUser?.password || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                password: e.target.value,
+                              })
+                            }
+                            placeholder="Enter password"
+                          />
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="phoneNumber">Phone Number</Label>
+                          <Input
+                            id="phoneNumber"
+                            value={currentUser?.phoneNumber || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                phoneNumber: e.target.value,
+                              })
+                            }
+                            placeholder="Enter phone number"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="country">Country</Label>
+                          <Select
+                            value={currentUser?.country || ""}
+                            onValueChange={(value) =>
+                              setCurrentUser({ ...currentUser, country: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {countries.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
                       <div className="grid gap-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="designation">Designation</Label>
                         <Input
-                          id="name"
-                          value={currentUser?.name || ""}
+                          id="designation"
+                          value={currentUser?.designation || ""}
                           onChange={(e) =>
                             setCurrentUser({
                               ...currentUser,
-                              name: e.target.value,
+                              designation: e.target.value,
                             })
                           }
-                          placeholder="Enter full name"
+                          placeholder="e.g. Senior Developer"
                         />
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={currentUser?.email || ""}
-                          onChange={(e) =>
-                            setCurrentUser({
-                              ...currentUser,
-                              email: e.target.value,
-                            })
-                          }
-                          placeholder="Enter email address"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="role">Role</Label>
-                        <Select
-                          value={currentUser?.role || "team_member"}
-                          onValueChange={(value) =>
-                            setCurrentUser({ ...currentUser, role: value })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            {/* <SelectItem value="project_manager">
-                              Project Manager
-                            </SelectItem>
-                            <SelectItem value="team_member">
-                              Team Member
-                            </SelectItem> */}
-                            {roles.map((role) => (
-                              <SelectItem key={role._id} value={`${role.name}`}>
-                                {role.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={currentUser?.password || ""}
-                          onChange={(e) =>
-                            setCurrentUser({
-                              ...currentUser,
-                              password: e.target.value,
-                            })
-                          }
-                          placeholder="Enter password"
-                        />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="monthlySalary">Monthly Salary</Label>
+                          <Input
+                            id="monthlySalary"
+                            type="number"
+                            value={currentUser?.monthlySalary || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                monthlySalary: e.target.value,
+                              })
+                            }
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="perHourBudget">Per Hour Budget</Label>
+                          <Input
+                            id="perHourBudget"
+                            type="number"
+                            value={currentUser?.perHourBudget || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                perHourBudget: e.target.value,
+                              })
+                            }
+                            placeholder="0.00"
+                          />
+                        </div>
                       </div>
                     </div>
                     <DialogFooter>
@@ -989,7 +1035,7 @@ export default function AdminPage() {
                   open={isEditUserDialogOpen}
                   onOpenChange={setIsEditUserDialogOpen}
                 >
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Edit User</DialogTitle>
                       <DialogDescription>
@@ -997,77 +1043,163 @@ export default function AdminPage() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-name">Name</Label>
+                          <Input
+                            id="edit-name"
+                            value={currentUser?.name || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                name: e.target.value,
+                              })
+                            }
+                            placeholder="Enter full name"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-email">Email</Label>
+                          <Input
+                            id="edit-email"
+                            type="email"
+                            value={currentUser?.email || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                email: e.target.value,
+                              })
+                            }
+                            disabled
+                            placeholder="Enter email address"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-role">Role</Label>
+                          <Select
+                            value={currentUser?.role || "team_member"}
+                            onValueChange={(value) =>
+                              setCurrentUser({ ...currentUser, role: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="admin">Admin</SelectItem>
+                              {roles.map((role) => (
+                                <SelectItem key={role._id} value={`${role.name}`}>
+                                  {role.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-password">Password</Label>
+                          <Input
+                            id="edit-password"
+                            type="password"
+                            value={currentUser?.password || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                password: e.target.value,
+                              })
+                            }
+                            placeholder="Leave blank to keep current"
+                          />
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-phoneNumber">Phone Number</Label>
+                          <Input
+                            id="edit-phoneNumber"
+                            value={currentUser?.phoneNumber || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                phoneNumber: e.target.value,
+                              })
+                            }
+                            placeholder="Enter phone number"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-country">Country</Label>
+                          <Select
+                            value={currentUser?.country || ""}
+                            onValueChange={(value) =>
+                              setCurrentUser({ ...currentUser, country: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {countries.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
                       <div className="grid gap-2">
-                        <Label htmlFor="edit-name">Name</Label>
+                        <Label htmlFor="edit-designation">Designation</Label>
                         <Input
-                          id="edit-name"
-                          value={currentUser?.name || ""}
+                          id="edit-designation"
+                          value={currentUser?.designation || ""}
                           onChange={(e) =>
                             setCurrentUser({
                               ...currentUser,
-                              name: e.target.value,
+                              designation: e.target.value,
                             })
                           }
-                          placeholder="Enter full name"
+                          placeholder="e.g. Senior Developer"
                         />
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="edit-email">Email</Label>
-                        <Input
-                          id="edit-email"
-                          type="email"
-                          value={currentUser?.email || ""}
-                          onChange={(e) =>
-                            setCurrentUser({
-                              ...currentUser,
-                              email: e.target.value,
-                            })
-                          }
-                          disabled
-                          placeholder="Enter email address"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="edit-role">Role</Label>
-                        <Select
-                          value={currentUser?.role || "team_member"}
-                          onValueChange={(value) =>
-                            setCurrentUser({ ...currentUser, role: value })
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="admin">Admin</SelectItem>
-                            {/* <SelectItem value="project_manager">
-                              Project Manager
-                            </SelectItem>
-                            <SelectItem value="team_member">
-                              Team Member
-                            </SelectItem> */}
-                            {roles.map((role) => (
-                              <SelectItem key={role._id} value={`${role.name}`}>
-                                {role.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="edit-password">Password</Label>
-                        <Input
-                          id="edit-password"
-                          type="password"
-                          value={currentUser?.password || ""}
-                          onChange={(e) =>
-                            setCurrentUser({
-                              ...currentUser,
-                              password: e.target.value,
-                            })
-                          }
-                          placeholder="Leave blank to keep current"
-                        />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-monthlySalary">Monthly Salary</Label>
+                          <Input
+                            id="edit-monthlySalary"
+                            type="number"
+                            value={currentUser?.monthlySalary || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                monthlySalary: e.target.value,
+                              })
+                            }
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="edit-perHourBudget">Per Hour Budget</Label>
+                          <Input
+                            id="edit-perHourBudget"
+                            type="number"
+                            value={currentUser?.perHourBudget || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser,
+                                perHourBudget: e.target.value,
+                              })
+                            }
+                            placeholder="0.00"
+                          />
+                        </div>
                       </div>
                     </div>
                     <DialogFooter>
@@ -1087,7 +1219,7 @@ export default function AdminPage() {
                   open={isViewUserDialogOpen}
                   onOpenChange={setIsViewUserDialogOpen}
                 >
-                  <DialogContent>
+                  <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                       <DialogTitle>User Details</DialogTitle>
                       <DialogDescription>
@@ -1102,30 +1234,50 @@ export default function AdminPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <h3 className="text-sm font-medium text-muted-foreground">
-                            Name
-                          </h3>
-                          <p className="mt-1 font-medium">
-                            {currentUser?.name}
-                          </p>
+                          <h3 className="text-sm font-medium text-muted-foreground">Name</h3>
+                          <p className="mt-1 font-medium">{currentUser?.name}</p>
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-muted-foreground">
-                            Email
-                          </h3>
+                          <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
                           <p className="mt-1">{currentUser?.email}</p>
                         </div>
                       </div>
-                      <div>
-                        <h3 className="text-sm font-medium text-muted-foreground">
-                          Role
-                        </h3>
-                        <div className="mt-1">
-                          <Badge
-                            className={getRoleBadgeColor(currentUser?.role)}
-                          >
-                            {formatRoleName(currentUser?.role)}
-                          </Badge>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Phone</h3>
+                          <p className="mt-1">{currentUser?.phoneNumber || "N/A"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Country</h3>
+                          <p className="mt-1">{currentUser?.country || "N/A"}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Role</h3>
+                          <div className="mt-1">
+                            <Badge className={getRoleBadgeColor(currentUser?.role)}>
+                              {formatRoleName(currentUser?.role)}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Designation</h3>
+                          <p className="mt-1">{currentUser?.designation || "N/A"}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Monthly Salary</h3>
+                          <p className="mt-1 font-medium">
+                            {currentUser?.monthlySalary ? `$${currentUser.monthlySalary}` : "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">Per Hour Budget</h3>
+                          <p className="mt-1 font-medium">
+                            {currentUser?.perHourBudget ? `$${currentUser.perHourBudget}/hr` : "N/A"}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1488,47 +1640,6 @@ export default function AdminPage() {
                             )}
                           </div>
                         </div>
-                        {/* <ScrollArea className="h-[300px] rounded-md border p-4">
-                          <div className="space-y-6">
-                            {Object.entries(allPermissions).map(
-                              ([category, permissions]) => (
-                                <div key={category} className="space-y-2">
-                                  <h3 className="text-sm font-medium capitalize">
-                                    {category}
-                                  </h3>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    {permissions.map((permission) => (
-                                      <div
-                                        key={permission}
-                                        className="flex items-center space-x-2"
-                                      >
-                                        <Checkbox
-                                          id={permission}
-                                          checked={(
-                                            currentRole?.permissions || []
-                                          ).includes(permission)}
-                                          onCheckedChange={(checked) =>
-                                            handlePermissionChange(
-                                              permission,
-                                              checked
-                                            )
-                                          }
-                                        />
-                                        <Label
-                                          htmlFor={permission}
-                                          className="text-sm font-normal capitalize"
-                                        >
-                                          {permission.replace(/_/g, " ")}
-                                        </Label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <Separator className="my-2" />
-                                </div>
-                              )
-                            )}
-                          </div>
-                        </ScrollArea> */}
                       </div>
                     </div>
                     <DialogFooter>
@@ -1646,47 +1757,6 @@ export default function AdminPage() {
                             )}
                           </div>
                         </div>
-                        {/* <ScrollArea className="h-[300px] rounded-md border p-4">
-                          <div className="space-y-6">
-                            {Object.entries(allPermissions).map(
-                              ([category, permissions]) => (
-                                <div key={category} className="space-y-2">
-                                  <h3 className="text-sm font-medium capitalize">
-                                    {category}
-                                  </h3>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                    {permissions.map((permission) => (
-                                      <div
-                                        key={permission}
-                                        className="flex items-center space-x-2"
-                                      >
-                                        <Checkbox
-                                          id={`edit-${permission}`}
-                                          checked={(
-                                            currentRole?.permissions || []
-                                          ).includes(permission)}
-                                          onCheckedChange={(checked) =>
-                                            handlePermissionChange(
-                                              permission,
-                                              checked
-                                            )
-                                          }
-                                        />
-                                        <Label
-                                          htmlFor={`edit-${permission}`}
-                                          className="text-sm font-normal capitalize"
-                                        >
-                                          {permission.replace(/_/g, " ")}
-                                        </Label>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <Separator className="my-2" />
-                                </div>
-                              )
-                            )}
-                          </div>
-                        </ScrollArea> */}
                       </div>
                     </div>
                     <DialogFooter>
@@ -1810,18 +1880,6 @@ export default function AdminPage() {
                 </Dialog>
               </div>
             </TabsContent>
-
-            {/* <TabsContent value="system">
-              <Card>
-                <CardHeader>
-                  <CardTitle>System Settings</CardTitle>
-                  <CardDescription>Configure global system settings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">System settings will be available in a future update.</p>
-                </CardContent>
-              </Card>
-            </TabsContent> */}
           </Tabs>
         </div>
       </DashboardShell>
