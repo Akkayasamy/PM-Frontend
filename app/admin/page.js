@@ -563,6 +563,8 @@ export default function AdminPage() {
     if (role === "admin") return "Admin";
     if (role === "project_manager") return "Project Manager";
     if (role === "team_member") return "Team Member";
+    if (role === "team_leader") return "Team Leader";
+
 
     if (role && role.startsWith("custom_")) {
       const roleId = role.replace("custom_", "");
@@ -960,8 +962,8 @@ export default function AdminPage() {
                               <SelectValue placeholder="Select country" />
                             </SelectTrigger>
                             <SelectContent side="bottom" position="popper">
-                              {countries.map((country) => (
-                                <SelectItem key={country} value={country}>
+                              {countries.map((country, i) => (
+                                <SelectItem key={i} value={country}>
                                   {country}
                                 </SelectItem>
                               ))}
@@ -1144,8 +1146,8 @@ export default function AdminPage() {
                               <SelectValue placeholder="Select country" />
                             </SelectTrigger>
                             <SelectContent side="bottom" position="popper">
-                              {countries.map((country) => (
-                                <SelectItem key={country} value={country}>
+                              {countries.map((country, i) => (
+                                <SelectItem key={i} value={country}>
                                   {country}
                                 </SelectItem>
                               ))}

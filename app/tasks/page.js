@@ -1476,7 +1476,7 @@ export default function TasksPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
-                          {milestones.map((milestone) => (
+                          {milestones.filter(m => m.projectId === formData.projectId).map((milestone) => (
                             <SelectItem
                               key={milestone._id}
                               value={milestone._id}
@@ -1923,7 +1923,7 @@ export default function TasksPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
-                          {milestones.map((milestone) => (
+                          {milestones.filter(m => m.projectId === formData.projectId).map((milestone) => (
                             <SelectItem
                               key={milestone._id}
                               value={milestone._id}
