@@ -129,6 +129,7 @@ export default function ProjectsPage() {
   const [clients, setClients] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [backendProjectTypes, setBackendProjectTypes] = useState([]); // New state for backend types
+  const [teamMembers, setTeamMembers] = useState(); // New state for team-specific members
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -186,6 +187,24 @@ export default function ProjectsPage() {
 
   const projectManagers = users.filter((u) => u.role === "project_manager");
   const teamLeads = users.filter((u) => u.role === "team_leader");
+
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      if (!formData.teamleadId) {
+        setTeamMembers();
+        return;
+      }
+      try {
+
+        const response = await api.get(`/user/team/${formData.teamleadId}`);
+        setTeamMembers(response?.data?.teams[0] || {});
+      } catch (err) {
+        console.error("Error fetching team members:", err);
+        setTeamMembers([]);
+      }
+    };
+    fetchTeamMembers();
+  }, [formData.teamleadId]);
 
   useEffect(() => {
     const loadResponse = async () => {
@@ -609,17 +628,14 @@ export default function ProjectsPage() {
     }
   };
 
-  // ─── UPDATED Resources Tab ───────────────────────────────────────
+  const getUserNameById = (userId) => {
+    const user = users.find((u) => u._id === userId);
+    return user ? user.name : "Unknown Member";
+  };
 
   const ResourcesTabForm = ({ isViewOnly }) => {
-
-    const availableMembers = users.filter(
-      (u) =>
-        u.role === "team_member" ||
-        u.role === "project_manager" ||
-        u.role === "team_leadar"
-    );
-    console.log(formData.resources, '<<<<<<')
+    // Using teamMembers state for the dropdown, but users state for name lookups
+    const availableMembers = teamMembers?.members;
 
     if (isViewOnly) {
       return (
@@ -632,19 +648,21 @@ export default function ProjectsPage() {
               No members added yet
             </p>
           ) : (
-            currentProject?.resources?.map((memberId, i) => {
-              const member = users.find((u) => u._id === memberId);
-
-              return member ? (
-                <Badge
-                  key={i}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
-                  {member.name}
-                </Badge>
-              ) : null;
-            })
+            <div className="flex flex-wrap gap-2 mt-2">
+              {currentProject?.resources?.map((memberId, i) => {
+                // Look up the name in the global users state using the ID
+                const member = users.find((u) => u._id === memberId);
+                return member ? (
+                  <Badge
+                    key={i}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {member.name}
+                  </Badge>
+                ) : null;
+              })}
+            </div>
           )}
         </>
       )
@@ -672,7 +690,6 @@ export default function ProjectsPage() {
                     className="flex items-center gap-1"
                   >
                     {member.name}
-
                     <Button
                       type="button"
                       variant="ghost"
@@ -685,7 +702,7 @@ export default function ProjectsPage() {
                       <X className="h-3 w-3" />
                     </Button>
                   </Badge>
-                ) : null;
+                ) : null
               })
             )}
           </div>
@@ -697,18 +714,17 @@ export default function ProjectsPage() {
 
           <Select onValueChange={handleProjectMemberSelect}>
             <SelectTrigger id="add-member">
-              <SelectValue placeholder="Select a team member" />
+              <SelectValue placeholder={!formData.teamleadId ? "Please select a Team Leader first" : "Select a team member"} />
             </SelectTrigger>
-
             <SelectContent>
               {availableMembers
-                .filter(
+                ?.filter(
                   (member) =>
-                    !(formData.resources || []).includes(member._id)
+                    !(formData.resources || []).includes(member)
                 )
                 .map((member, i) => (
-                  <SelectItem key={i} value={member._id}>
-                    {member.name}
+                  <SelectItem key={i} value={member}>
+                    {getUserNameById(member)}
                   </SelectItem>
                 ))}
             </SelectContent>
@@ -717,7 +733,6 @@ export default function ProjectsPage() {
       </div>
     );
   };
-
   // Kanban Project Card Component
   const ProjectCard = ({ project }) => (
     <Card
