@@ -323,7 +323,9 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
           </div>
         </td>
         <td className="py-3 px-3 font-bold text-foreground text-[13px]">{milestone.name || milestone.title}</td>
-        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.startDate || "—"}</td>
+        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.managerName || "—"}</td>
+
+        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.teamleadName || "—"}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.dueDate || "—"}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.completedDate || "—"}</td>
 
@@ -364,6 +366,8 @@ const ProjectTree = ({ milestones = [], refetch }) => {
               <tr className="bg-muted/50 border-b border-border">
                 <th className="py-2.5 px-4 text-left text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 w-20">#</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400">Milestone Name</th>
+                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Project Manager</th>
+                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Team Leader</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Start Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Due Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Completion <span className="px-4">Date</span></th>
