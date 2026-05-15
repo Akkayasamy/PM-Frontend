@@ -230,8 +230,8 @@ const TaskRow = ({ task, index, onEditTask, onEditSubtask, onEditTimesheet }) =>
             <span className="text-[11px] font-semibold text-muted-foreground truncate max-w-[100px]">{name}</span>
           </div>
         </td>
-        <td className="py-2.5 px-3 text-[11px] font-medium text-muted-foreground">{task.startDate || "—"}</td>
-        <td className="py-2.5 px-3 text-[11px] font-medium text-muted-foreground">{task.endDate || "—"}</td>
+        <td className="py-2.5 px-3 text-[11px] font-medium text-muted-foreground">{task.planDate || "—"}</td>
+        <td className="py-2.5 px-3 text-[11px] font-medium text-muted-foreground">{task.actualDate || "—"}</td>
         <td className="py-2.5 px-3"><StatusBadge status={task.status} /></td>
         <td className="py-2.5 px-3 text-right">
           <ActionBtn onClick={() => window.open("/tasks", "_blank")} />
@@ -279,8 +279,8 @@ const TaskSection = ({ tasks = [], onEditTask, onEditSubtask, onEditTimesheet })
                 <th className="py-2 px-2 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-8">#</th>
                 <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400">Task Title</th>
                 <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-40">Assignee</th>
-                <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-28">Start Date</th>
-                <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-28">End Date</th>
+                <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-28">Plan Date</th>
+                <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-28">Actual Date</th>
                 <th className="py-2 px-3 text-left text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-28">Status</th>
                 <th className="py-2 px-3 text-right text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400 w-16">Actions</th>
               </tr>
