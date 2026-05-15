@@ -323,8 +323,10 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
           </div>
         </td>
         <td className="py-3 px-3 font-bold text-foreground text-[13px]">{milestone.name || milestone.title}</td>
-        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone.startDate || "—"}</td>
-        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone.endDate || milestone.dueDate || "—"}</td>
+        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.startDate || "—"}</td>
+        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.dueDate || "—"}</td>
+        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.completedDate || "—"}</td>
+
         <td className="py-3 px-3"><StatusBadge status={milestone.status} /></td>
         <td className="py-3 px-3 text-right">
           <ActionBtn onClick={() => window.open("/milestones", "_blank")} />
@@ -364,6 +366,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400">Milestone Name</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Start Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Due Date</th>
+                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Completion <span className="px-4">Date</span></th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Status</th>
                 <th className="py-2.5 px-3 text-right text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-20">Actions</th>
               </tr>
@@ -381,8 +384,9 @@ const ProjectTree = ({ milestones = [], refetch }) => {
             </tbody>
           </table>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
