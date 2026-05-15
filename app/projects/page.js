@@ -630,7 +630,7 @@ export default function ProjectsPage() {
 
   const getUserNameById = (userId) => {
     const user = users.find((u) => u._id === userId);
-    return user ? user.name : "Unknown Member";
+    return user ? user.name : "-";
   };
 
   const ResourcesTabForm = ({ isViewOnly }) => {
@@ -1044,6 +1044,23 @@ export default function ProjectsPage() {
                         onClick={() => handleSort("clientName")}
                       >
                         <div className="flex items-center">
+                          Team Leader
+                          {sortField === "deliveryManager" ? (
+                            sortDirection === "asc" ? (
+                              <ArrowUp className="ml-2 h-4 w-4" />
+                            ) : (
+                              <ArrowDown className="ml-2 h-4 w-4" />
+                            )
+                          ) : (
+                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
+                          )}
+                        </div>
+                      </TableHead>
+                      <TableHead
+                        className="cursor-pointer"
+                        onClick={() => handleSort("clientName")}
+                      >
+                        <div className="flex items-center">
                           Client
                           {sortField === "clientName" ? (
                             sortDirection === "asc" ? (
@@ -1126,7 +1143,9 @@ export default function ProjectsPage() {
                             </div>
                           </TableCell>
 
-                          <TableCell>{project.clientProjectManager || "-"}</TableCell>
+                          <TableCell>{getUserNameById(project.managerId) || "-"}</TableCell>
+
+                          <TableCell>{getUserNameById(project.teamleadId) || "-"}</TableCell>
 
                           <TableCell>{project.clientName || "-"}</TableCell>
 
@@ -1724,6 +1743,17 @@ export default function ProjectsPage() {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
+
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">
+                            Actual Date
+                          </h3>
+                          <p className="mt-1">
+                            {currentProject.actualDate
+                              ? formatDate(currentProject.actualDate)
+                              : "N/A"}
+                          </p>
+                        </div>
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground">
                             Duration
@@ -1736,6 +1766,19 @@ export default function ProjectsPage() {
                           </p>
                         </div>
 
+                        {/* <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">
+                            Project Manager
+                          </h3>
+                          <p className="mt-1">
+                            {currentProject.managerId
+                              ? getManager(currentProject.managerId)?.name ||
+                              "Unassigned"
+                              : "Unassigned"}
+                          </p>
+                        </div> */}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground">
                             Project Manager
@@ -1747,8 +1790,19 @@ export default function ProjectsPage() {
                               : "Unassigned"}
                           </p>
                         </div>
-                      </div>
 
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground">
+                            Team Leader
+                          </h3>
+                          <p className="mt-1">
+                            {currentProject.teamleadId
+                              ? getManager(currentProject.teamleadId)?.name ||
+                              "Unassigned"
+                              : "Unassigned"}
+                          </p>
+                        </div>
+                      </div>
                       <div>
                         <h3 className="text-sm font-medium text-muted-foreground">
                           Description
