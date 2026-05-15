@@ -959,7 +959,7 @@ export default function AdminPage() {
                             <SelectTrigger>
                               <SelectValue placeholder="Select country" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent side="bottom" position="popper">
                               {countries.map((country) => (
                                 <SelectItem key={country} value={country}>
                                   {country}
@@ -1143,7 +1143,7 @@ export default function AdminPage() {
                             <SelectTrigger>
                               <SelectValue placeholder="Select country" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent side="bottom" position="popper">
                               {countries.map((country) => (
                                 <SelectItem key={country} value={country}>
                                   {country}
