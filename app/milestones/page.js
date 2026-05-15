@@ -72,6 +72,7 @@ export default function MilestonesPage() {
     description: "",
     startDate: "",
     dueDate: "",
+    completedDate: "",
     projectId: "",
     status: "planned",
   });
@@ -131,6 +132,7 @@ export default function MilestonesPage() {
       name: "",
       description: "",
       dueDate: "",
+      completedDate: "",
       projectId: "",
       status: "planned",
     });
@@ -276,8 +278,8 @@ export default function MilestonesPage() {
                         onChange={handleInputChange}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="grid gap-2">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="grid ">
                         <Label htmlFor="startDate">Start Date</Label>
                         <Input
                           id="startDate"
@@ -287,13 +289,23 @@ export default function MilestonesPage() {
                           onChange={handleInputChange}
                         />
                       </div>
-                      <div className="grid gap-2">
+                      <div className="grid">
                         <Label htmlFor="dueDate">Due Date</Label>
                         <Input
                           id="dueDate"
                           name="dueDate"
                           type="date"
                           value={formData.dueDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="grid">
+                        <Label htmlFor="completedDate">Completed Date</Label>
+                        <Input
+                          id="completedDate"
+                          name="completedDate"
+                          type="date"
+                          value={formData.completedDate}
                           onChange={handleInputChange}
                         />
                       </div>
@@ -478,8 +490,8 @@ export default function MilestonesPage() {
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
+              <div className="grid grid-cols-3">
+                <div className="grid ">
                   <Label htmlFor="startDate">Start Date</Label>
                   <Input
                     id="startDate"
@@ -489,13 +501,24 @@ export default function MilestonesPage() {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="grid gap-2">
+                <div className="grid">
                   <Label htmlFor="dueDate">Due Date</Label>
                   <Input
                     id="dueDate"
                     name="dueDate"
                     type="date"
                     value={formData.dueDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="grid">
+                  <Label htmlFor="completedDate">completed Date</Label>
+                  <Input
+                    id="completedDate"
+                    name="completedDate"
+                    type="date"
+                    value={formData.completedDate}
                     onChange={handleInputChange}
                   />
                 </div>
