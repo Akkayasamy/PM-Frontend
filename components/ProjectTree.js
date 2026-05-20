@@ -30,6 +30,8 @@ const StatusBadge = ({ status }) => {
     approved: { bg: "rgba(209, 250, 229, 0.2)", color: "#10b981", border: "rgba(16, 185, 129, 0.3)" },
     pending: { bg: "rgba(254, 243, 199, 0.2)", color: "#f59e0b", border: "rgba(245, 158, 11, 0.3)" },
     open: { bg: "rgba(241, 245, 249, 0.2)", color: "#64748b", border: "rgba(100, 116, 139, 0.3)" },
+    draft: { bg: "rgba(241, 245, 249, 0.2)", color: "#64748b", border: "rgba(100, 116, 139, 0.3)" },
+    delayed: { bg: "rgba(254, 226, 226, 0.2)", color: "#ef4444", border: "rgba(239, 68, 68, 0.3)" },
   };
   const key = status?.toLowerCase().replace(/[\s_]/g, "") || "todo";
   const s = map[key] || map.todo;
@@ -95,7 +97,7 @@ const ITD = ({ children, className = "" }) => (
   </td>
 );
 
-const TimesheetSection = ({ timesheets = [], onEditTimesheet, userData }) => {
+const TimesheetSection = ({ timesheets = [], onEditTimesheet, userData, title }) => {
   const [open, setOpen] = useState(false);
   if (!timesheets || timesheets.length === 0) return null;
 
@@ -112,10 +114,10 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet, userData }) => {
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Work Date</ITH>
-                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Logged By</ITH>
+                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Title</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400 text-center">Hours</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Remarks</ITH>
+                <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400">Work Date</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400 text-center">Status</ITH>
                 <ITH className="!bg-cyan-500/10 !text-cyan-600 dark:!text-cyan-400 text-right ">Actions</ITH>
               </tr>
@@ -123,14 +125,14 @@ const TimesheetSection = ({ timesheets = [], onEditTimesheet, userData }) => {
             <tbody>
               {timesheets.map((ts, i) => (
                 <tr key={ts._id || i} className="hover:bg-cyan-500/5 transition-colors">
-                  <ITD className="font-semibold text-foreground">{ts.date ? new Date(ts.date).toISOString().split("T")[0] : "—"}</ITD>
-                  <ITD className="font-semibold text-foreground">{userData?.name || "—"}</ITD>
+                  <ITD className="font-semibold text-foreground">{title || "—"}</ITD>
                   <ITD className="text-center">
                     <span className="font-bold text-cyan-600 bg-cyan-500/10 px-2 py-0.5 rounded-full text-[11px]">
                       {ts.hours || ts.hoursWorked || "0"}h
                     </span>
                   </ITD>
                   <ITD className="text-muted-foreground italic max-w-[200px] truncate">{ts.remarks || ts.description || "—"}</ITD>
+                  <ITD className="font-semibold text-foreground">{ts.date ? new Date(ts.date).toISOString().split("T")[0] : "—"}</ITD>
                   <ITD className="text-center"><StatusBadge status={ts.approvalStatus || ts.status} /></ITD>
                   <ITD className="text-right">
                     <ActionBtn onClick={() => window.open("/timesheets", "_blank")} />
@@ -189,7 +191,7 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
                   {(st.timesheets?.length > 0 || st.subtasks?.length > 0 || st.children?.length > 0) && (
                     <tr>
                       <td colSpan={7} className="px-3 pb-2 bg-muted/10">
-                        <TimesheetSection timesheets={st.timesheets} onEditTimesheet={onEditTimesheet} userData={st?.userData} />
+                        <TimesheetSection timesheets={st.timesheets} onEditTimesheet={onEditTimesheet} userData={st?.userData} title={st?.title} />
                         <SubtaskSection
                           subtasks={st.subtasks || st.children}
                           onEditSubtask={onEditSubtask}
@@ -250,6 +252,7 @@ const TaskRow = ({ task, index, onEditTask, onEditSubtask, onEditTimesheet }) =>
               timesheets={task.timesheets}
               onEditTimesheet={onEditTimesheet}
               userData={task?.userDetails}
+              title={task?.title}
             />
           </td>
         </tr>
@@ -324,11 +327,10 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
         </td>
         <td className="py-3 px-3 font-bold text-foreground text-[13px]">{milestone.name || milestone.title}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.managerName || "—"}</td>
-
         <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.teamleadName || "—"}</td>
+        <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.startDate || "—"}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.dueDate || "—"}</td>
         <td className="py-3 px-3 text-[11px] font-semibold text-muted-foreground">{milestone?.completedDate || "—"}</td>
-
         <td className="py-3 px-3"><StatusBadge status={milestone.status} /></td>
         <td className="py-3 px-3 text-right">
           <ActionBtn onClick={() => window.open("/milestones", "_blank")} />
@@ -337,7 +339,8 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
 
       {open && (
         <tr>
-          <td colSpan={7} className="bg-indigo-500/5 px-4 py-1 border-b border-border/50">
+          {/* FIX: was colSpan={7}, table has 9 columns so changed to colSpan={9} */}
+          <td colSpan={9} className="bg-indigo-500/5 px-4 py-1 border-b border-border/50">
             <TaskSection
               tasks={milestone.tasks}
               onEditTask={(t) => { setTaskEditData(t); setTaskModalOpen(true); }}
@@ -370,7 +373,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Team Leader</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Start Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Due Date</th>
-                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Completion <span className="px-4">Date</span></th>
+                <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Completion Date</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Status</th>
                 <th className="py-2.5 px-3 text-right text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-20">Actions</th>
               </tr>
@@ -380,7 +383,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
                 <MilestoneRow key={m._id || i} milestone={m} index={i} onEdit={(ms) => { setEditData(ms); setModalOpen(true); }} refetch={refetch} />
               )) : (
                 <tr>
-                  <td colSpan={7} className="py-6 text-center text-muted-foreground font-semibold italic text-sm">
+                  <td colSpan={9} className="py-6 text-center text-muted-foreground font-semibold italic text-sm">
                     No milestones found.
                   </td>
                 </tr>
@@ -388,9 +391,8 @@ const ProjectTree = ({ milestones = [], refetch }) => {
             </tbody>
           </table>
         </div>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 };
 
