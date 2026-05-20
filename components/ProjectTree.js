@@ -166,7 +166,7 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
               <tr>
                 <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400 w-8">#</ITH>
                 <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400">Subtask Title</ITH>
-                <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400">Created By</ITH>
+                {/* <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400">Created By</ITH> */}
                 <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400">Estimated Hours</ITH>
                 <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400">Start Date</ITH>
                 <ITH className="!bg-violet-500/10 !text-violet-600 dark:!text-violet-400">End Date</ITH>
@@ -178,12 +178,12 @@ const SubtaskSection = ({ subtasks = [], onEditSubtask, onEditTimesheet }) => {
                   <tr className="hover:bg-violet-500/5 transition-colors">
                     <ITD className="text-muted-foreground font-mono text-[10px]">{i + 1}</ITD>
                     <ITD className="font-semibold text-foreground">{st.title}</ITD>
-                    <ITD>
+                    {/* <ITD>
                       <div className="flex items-center gap-2">
                         <Avatar name={st?.userData?.name} size={22} />
                         <span className="text-[11px] font-semibold text-muted-foreground truncate max-w-[100px]">{st?.userData?.name}</span>
                       </div>
-                    </ITD>
+                    </ITD> */}
                     <ITD className="font-semibold text-foreground">{st?.estimatedHours || '-'}</ITD>
                     <ITD className="font-semibold text-foreground">{st?.startDate || '-'}</ITD>
                     <ITD className="font-semibold text-foreground">{st.endDate || '-'}</ITD>

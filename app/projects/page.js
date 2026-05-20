@@ -983,13 +983,13 @@ export default function ProjectsPage() {
           {/* Main Content */}
           {currentView === "table" ? (
             <>
-              {/* Table View */}
-              <div className="rounded-md border bg-white dark:bg-gray-800 shadow-sm">
-                <Table>
-                  <TableHeader className="bg-muted/50">
-                    <TableRow>
+              <div className="rounded-md border bg-background text-card-foreground shadow-sm overflow-auto max-h-[calc(100vh-220px)] relative w-full isolate">
+                <Table className="min-w-[1100px] w-full border-separate border-spacing-0">
+                  <TableHeader className="sticky top-0 z-30 bg-muted shadow-[0_1px_0_0_rgba(0,0,0,0.1)]">
+                    <TableRow className="hover:bg-transparent">
                       <TableHead
-                        className="w-[15%] cursor-pointer"
+                        className="cursor-pointer sticky left-0 top-0 z-40 bg-muted border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)]"
+                        style={{ minWidth: "140px" }}
                         onClick={() => handleSort("projectId")}
                       >
                         <div className="flex items-center">
@@ -1006,7 +1006,8 @@ export default function ProjectsPage() {
                         </div>
                       </TableHead>
                       <TableHead
-                        className="w-[20%] cursor-pointer"
+                        className="cursor-pointer sticky left-[140px] top-0 z-40 bg-muted border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)]"
+                        style={{ minWidth: "200px" }}
                         onClick={() => handleSort("name")}
                       >
                         <div className="flex items-center">
@@ -1022,104 +1023,49 @@ export default function ProjectsPage() {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead
-                        className="cursor-pointer"
-                        onClick={() => handleSort("clientName")}
-                      >
-                        <div className="flex items-center">
-                          Delivery Manager
-                          {sortField === "deliveryManager" ? (
-                            sortDirection === "asc" ? (
-                              <ArrowUp className="ml-2 h-4 w-4" />
-                            ) : (
-                              <ArrowDown className="ml-2 h-4 w-4" />
-                            )
-                          ) : (
-                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-                          )}
-                        </div>
+                      {["managerId", "teamleadId", "clientName", "startDate", "status"].map((field) => {
+                        const labelMap = {
+                          managerId: "Delivery Manager",
+                          teamleadId: "Team Leader",
+                          clientName: "Client",
+                          startDate: "Start Date",
+                          status: "Status",
+                        };
+                        return (
+                          <TableHead
+                            key={field}
+                            className="cursor-pointer sticky top-0 z-20 bg-muted border-b border-border"
+                            onClick={() => handleSort(field)}
+                          >
+                            <div className="flex items-center">
+                              {labelMap[field]}
+                              {sortField === field ? (
+                                sortDirection === "asc" ? (
+                                  <ArrowUp className="ml-2 h-4 w-4" />
+                                ) : (
+                                  <ArrowDown className="ml-2 h-4 w-4" />
+                                )
+                              ) : (
+                                <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
+                              )}
+                            </div>
+                          </TableHead>
+                        );
+                      })}
+
+                      <TableHead className="w-[100px] sticky top-0 z-20 bg-muted border-b border-border">
+                        Actions
                       </TableHead>
-                      <TableHead
-                        className="cursor-pointer"
-                        onClick={() => handleSort("clientName")}
-                      >
-                        <div className="flex items-center">
-                          Team Leader
-                          {sortField === "deliveryManager" ? (
-                            sortDirection === "asc" ? (
-                              <ArrowUp className="ml-2 h-4 w-4" />
-                            ) : (
-                              <ArrowDown className="ml-2 h-4 w-4" />
-                            )
-                          ) : (
-                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-                          )}
-                        </div>
-                      </TableHead>
-                      <TableHead
-                        className="cursor-pointer"
-                        onClick={() => handleSort("clientName")}
-                      >
-                        <div className="flex items-center">
-                          Client
-                          {sortField === "clientName" ? (
-                            sortDirection === "asc" ? (
-                              <ArrowUp className="ml-2 h-4 w-4" />
-                            ) : (
-                              <ArrowDown className="ml-2 h-4 w-4" />
-                            )
-                          ) : (
-                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-                          )}
-                        </div>
-                      </TableHead>
-                      <TableHead
-                        className="cursor-pointer"
-                        onClick={() => handleSort("startDate")}
-                      >
-                        <div className="flex items-center">
-                          Start Date
-                          {sortField === "startDate" ? (
-                            sortDirection === "asc" ? (
-                              <ArrowUp className="ml-2 h-4 w-4" />
-                            ) : (
-                              <ArrowDown className="ml-2 h-4 w-4" />
-                            )
-                          ) : (
-                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-                          )}
-                        </div>
-                      </TableHead>
-                      <TableHead
-                        className="cursor-pointer"
-                        onClick={() => handleSort("status")}
-                      >
-                        <div className="flex items-center">
-                          Status
-                          {sortField === "status" ? (
-                            sortDirection === "asc" ? (
-                              <ArrowUp className="ml-2 h-4 w-4" />
-                            ) : (
-                              <ArrowDown className="ml-2 h-4 w-4" />
-                            )
-                          ) : (
-                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-                          )}
-                        </div>
-                      </TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
+
                   <TableBody>
                     {paginatedProjects.length === 0 ? (
-                      <TableRow key="empty-row">
-                        <TableCell colSpan={6} className="text-center py-8">
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8 bg-background text-muted-foreground">
                           <div className="flex flex-col items-center justify-center">
                             <Briefcase className="h-12 w-12 text-muted-foreground/50 mb-2" />
-                            <p className="text-muted-foreground">
-                              No projects found.{" "}
-                              {canCreate && "Create your first project!"}
-                            </p>
+                            <p>No projects found.</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -1127,14 +1073,21 @@ export default function ProjectsPage() {
                       paginatedProjects.map((project, index) => (
                         <TableRow
                           key={project.id || project._id || index}
-                          className="hover:bg-muted/50"
+                          className="group transition-none"
                         >
-                          <TableCell>{project.projectId || "-"}</TableCell>
+                          <TableCell
+                            className="sticky left-0 z-10 border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)] bg-background group-hover:bg-muted"
+                            style={{ minWidth: "140px" }}
+                          >
+                            {project.projectId || "-"}
+                          </TableCell>
 
-                          <TableCell className="font-medium">
+                          <TableCell
+                            className="font-medium sticky left-[140px] z-10 border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)] bg-background group-hover:bg-muted"
+                            style={{ minWidth: "200px" }}
+                          >
                             <div className="flex flex-col">
                               <span>{project.name}</span>
-
                               {project.projectType?.typeName && (
                                 <span className="text-xs text-muted-foreground">
                                   {project.projectType?.typeName}
@@ -1143,86 +1096,63 @@ export default function ProjectsPage() {
                             </div>
                           </TableCell>
 
-                          <TableCell>{getUserNameById(project.managerId) || "-"}</TableCell>
-
-                          <TableCell>{getUserNameById(project.teamleadId) || "-"}</TableCell>
-
-                          <TableCell>{project.clientName || "-"}</TableCell>
-
-                          <TableCell>
-                            {project.startDate
-                              ? formatDate(project.startDate)
-                              : "-"}
+                          <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
+                            {getUserNameById(project.managerId) || "-"}
                           </TableCell>
 
-                          <TableCell>
+                          <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
+                            {getUserNameById(project.teamleadId) || "-"}
+                          </TableCell>
+
+                          <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
+                            {project.clientName || "-"}
+                          </TableCell>
+
+                          <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
+                            {project.startDate ? formatDate(project.startDate) : "-"}
+                          </TableCell>
+
+                          <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
                             <div className="flex items-center gap-2">
                               <Badge className={getStatusColor(project.status)}>
-                                {project.status
-                                  ?.replace("_", " ")
-                                  .replace(/\b\w/g, (l) => l.toUpperCase()) ||
-                                  "Planning"}
+                                {project.status?.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Planning"}
                               </Badge>
-
                               {project.active === false && (
-                                <Badge
-                                  variant="outline"
-                                  className="bg-gray-100 text-gray-800"
-                                >
+                                <Badge variant="outline" className="bg-gray-100 text-gray-800">
                                   Inactive
                                 </Badge>
                               )}
                             </div>
                           </TableCell>
 
-                          <TableCell>
+                          <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                >
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
                                   <span className="sr-only">Open menu</span>
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
-                                <DropdownMenuItem
-                                  onClick={() => openViewDialog(project._id)}
-                                  className="flex items-center"
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Details
+                                <DropdownMenuItem onClick={() => openViewDialog(project._id)} className="flex items-center">
+                                  <Eye className="mr-2 h-4 w-4" /> View Details
                                 </DropdownMenuItem>
-
                                 <DropdownMenuSeparator />
-
                                 {canEdit && (
-                                  <DropdownMenuItem
-                                    onClick={() => openEditDialog(project)}
-                                    className="flex items-center"
-                                  >
-                                    <Pencil className="mr-2 h-4 w-4" />
-                                    Edit
+                                  <DropdownMenuItem onClick={() => openEditDialog(project)} className="flex items-center">
+                                    <Pencil className="mr-2 h-4 w-4" /> Edit
                                   </DropdownMenuItem>
                                 )}
-
                                 {canDelete && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteProject(project)}
-                                    className="text-red-600 flex items-center"
-                                  >
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    Delete
+                                  <DropdownMenuItem onClick={() => handleDeleteProject(project)} className="text-red-600 flex items-center">
+                                    <Trash className="mr-2 h-4 w-4" /> Delete
                                   </DropdownMenuItem>
                                 )}
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
+
                         </TableRow>
                       ))
                     )}
@@ -1231,11 +1161,9 @@ export default function ProjectsPage() {
               </div>
 
               {/* Pagination controls */}
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mt-4">
                 <Button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
                   variant="outline"
                 >
@@ -1245,9 +1173,7 @@ export default function ProjectsPage() {
                   Page {currentPage} of {totalPages}
                 </span>
                 <Button
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                  }
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   variant="outline"
                 >
