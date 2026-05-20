@@ -320,7 +320,7 @@ const MilestoneRow = ({ milestone, index, onEdit, refetch }) => {
     <>
       <tr onClick={() => setOpen(p => !p)} className={`border-b border-border/50 cursor-pointer transition-colors ${open ? "bg-indigo-500/10" : "hover:bg-indigo-500/5"}`}>
         <td className="py-3 px-4">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <Chevron open={open} color="#4f46e5" />
             <span className="text-[11px] text-muted-foreground font-mono font-bold">{index + 1}</span>
           </div>
