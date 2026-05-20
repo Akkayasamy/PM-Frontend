@@ -921,13 +921,12 @@ export default function TasksPage() {
           {/* Main Content */}
           {currentView === "table" ? (
             <>
-              {/* Table View */}
-              <div className="rounded-md border bg-white dark:bg-gray-800 shadow-sm">
-                <Table>
+              <div className="rounded-md border bg-white dark:bg-gray-800 shadow-sm overflow-x-auto">
+                <Table className="w-full min-w-[1200px] border-collapse">
                   <TableHeader className="bg-muted/50">
                     <TableRow>
                       <TableHead
-                        className="w-[15%] cursor-pointer"
+                        className="w-[120px] min-w-[120px] cursor-pointer sticky left-0 z-20 bg-slate-50 dark:bg-gray-900 border-r"
                         onClick={() => handleSort("taskId")}
                       >
                         <div className="flex items-center">
@@ -944,7 +943,7 @@ export default function TasksPage() {
                         </div>
                       </TableHead>
                       <TableHead
-                        className="w-[30%] cursor-pointer"
+                        className="w-[280px] min-w-[280px] cursor-pointer sticky left-[120px] z-20 bg-slate-50 dark:bg-gray-900 border-r shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]"
                         onClick={() => handleSort("title")}
                       >
                         <div className="flex items-center">
@@ -961,7 +960,7 @@ export default function TasksPage() {
                         </div>
                       </TableHead>
                       <TableHead
-                        className="w-[20%] cursor-pointer"
+                        className="w-[140px] min-w-[140px] cursor-pointer"
                         onClick={() => handleSort("startDate")}
                       >
                         <div className="flex items-center">
@@ -977,8 +976,9 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
+
                       <TableHead
-                        className="w-[20%] cursor-pointer"
+                        className="w-[140px] min-w-[140px] cursor-pointer"
                         onClick={() => handleSort("endDate")}
                       >
                         <div className="flex items-center">
@@ -994,8 +994,9 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
+
                       <TableHead
-                        className="w-[20%] cursor-pointer"
+                        className="w-[180px] min-w-[180px] cursor-pointer"
                         onClick={() => handleSort("functionalConsultant")}
                       >
                         <div className="flex items-center">
@@ -1011,8 +1012,9 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
+
                       <TableHead
-                        className="cursor-pointer"
+                        className="w-[200px] min-w-[200px] cursor-pointer"
                         onClick={() => handleSort("projectId")}
                       >
                         <div className="flex items-center">
@@ -1028,11 +1030,13 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Priority</TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
+
+                      <TableHead className="w-[130px] min-w-[130px]">Status</TableHead>
+                      <TableHead className="w-[130px] min-w-[130px]">Priority</TableHead>
+                      <TableHead className="w-[100px] min-w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
+
                   <TableBody>
                     {paginatedTasks.length === 0 ? (
                       <TableRow>
@@ -1048,42 +1052,38 @@ export default function TasksPage() {
                       </TableRow>
                     ) : (
                       paginatedTasks.map((task, i) => (
-                        <TableRow key={i}>
-                          <TableCell>{task.taskId || "-"}</TableCell>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center">
-                              <div>
-                                <div className="flex items-center">
-                                  <span
-                                    className="cursor-pointer hover:underline"
-                                    onClick={() =>
-                                      router.push(`/tasks/${task.taskId}`)
-                                    }
-                                  >
-                                    {task.title}
-                                  </span>
-                                </div>
-                                {task.taskType && (
-                                  <span className="text-xs text-muted-foreground">
-                                    {task.taskType} - {task.taskNature}
-                                  </span>
-                                )}
-                              </div>
+                        <TableRow key={i} className="hover:bg-muted/30">
+                          <TableCell className="sticky left-0 z-10 bg-white dark:bg-gray-800 border-r font-medium whitespace-nowrap text-xs">
+                            {task.taskId || "-"}
+                          </TableCell>
+                          <TableCell className="sticky left-[120px] z-10 bg-white dark:bg-gray-800 border-r shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] font-medium">
+                            <div className="flex flex-col max-w-[260px]">
+                              <span
+                                className="cursor-pointer hover:underline text-sky-600 dark:text-sky-400 font-semibold truncate block text-[13px]"
+                                onClick={() => router.push(`/tasks/${task.taskId}`)}
+                              >
+                                {task.title}
+                              </span>
+                              {task.taskType && (
+                                <span className="text-[11px] text-muted-foreground truncate block mt-0.5">
+                                  {task.taskType} - {task.taskNature}
+                                </span>
+                              )}
                             </div>
                           </TableCell>
 
-                          <TableCell>
+                          <TableCell className="whitespace-nowrap text-xs">
                             {task.startDate ? task.startDate : ""}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="whitespace-nowrap text-xs">
                             {task.endDate ? task.endDate : ""}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="truncate max-w-[170px] text-xs">
                             {task.functionalConsultant
                               ? getUser(task.functionalConsultant)?.name || ""
                               : getUser(task.technicalConsultant)?.name || ""}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="truncate max-w-[190px] text-xs">
                             {task.projectId
                               ? getProject(task.projectId)?.name || "Unassigned"
                               : "Unassigned"}
@@ -1094,22 +1094,16 @@ export default function TasksPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 flex items-center gap-1"
+                                  className="h-7 flex items-center gap-1 text-xs px-0"
                                 >
-                                  <Badge
-                                    className={getStatusColor(
-                                      task.status || "Open"
-                                    )}
-                                  >
+                                  <Badge className={getStatusColor(task.status || "Open")}>
                                     {formatStatus(task.status)}
                                   </Badge>
-                                  <ChevronDown className="h-4 w-4" />
+                                  <ChevronDown className="h-3 w-3 opacity-70" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="start">
-                                <DropdownMenuLabel>
-                                  Change Status
-                                </DropdownMenuLabel>
+                                <DropdownMenuLabel>Change Status</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -1167,22 +1161,16 @@ export default function TasksPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 flex items-center gap-1"
+                                  className="h-7 flex items-center gap-1 text-xs px-0"
                                 >
-                                  <Badge
-                                    className={getPriorityColor(
-                                      task.priority || "medium"
-                                    )}
-                                  >
+                                  <Badge className={getPriorityColor(task.priority || "medium")}>
                                     {formatPriority(task.priority)}
                                   </Badge>
-                                  <ChevronDown className="h-4 w-4" />
+                                  <ChevronDown className="h-3 w-3 opacity-70" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="start">
-                                <DropdownMenuLabel>
-                                  Change Priority
-                                </DropdownMenuLabel>
+                                <DropdownMenuLabel>Change Priority</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -1218,41 +1206,25 @@ export default function TasksPage() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                >
+                                <Button variant="ghost" size="icon" className="h-7 w-7">
                                   <span className="sr-only">Open menu</span>
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    router.push(`/tasks/${task.taskId}`)
-                                  }
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Details
+                                <DropdownMenuItem onClick={() => router.push(`/tasks/${task.taskId}`)}>
+                                  <Eye className="mr-2 h-4 w-4" /> View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 {canEdit && (
-                                  <DropdownMenuItem
-                                    onClick={() => openEditDialog(task)}
-                                  >
-                                    <Pencil className="mr-2 h-4 w-4" />
-                                    Edit
+                                  <DropdownMenuItem onClick={() => openEditDialog(task)}>
+                                    <Pencil className="mr-2 h-4 w-4" /> Edit
                                   </DropdownMenuItem>
                                 )}
                                 {canDelete && (
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteTask(task)}
-                                    className="text-red-600"
-                                  >
-                                    <Trash className="mr-2 h-4 w-4" />
-                                    Delete
+                                  <DropdownMenuItem onClick={() => handleDeleteTask(task)} className="text-red-600">
+                                    <Trash className="mr-2 h-4 w-4" /> Delete
                                   </DropdownMenuItem>
                                 )}
                               </DropdownMenuContent>
@@ -1265,7 +1237,7 @@ export default function TasksPage() {
                 </Table>
               </div>
 
-              {/* Pagination for Table View */}
+              {/* Pagination View */}
               <div className="flex items-center justify-between mt-4">
                 <div className="flex items-center space-x-2">
                   <p className="text-sm text-muted-foreground">

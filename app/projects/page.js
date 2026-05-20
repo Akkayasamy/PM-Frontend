@@ -988,7 +988,7 @@ export default function ProjectsPage() {
                   <TableHeader className="sticky top-0 z-30 bg-muted shadow-[0_1px_0_0_rgba(0,0,0,0.1)]">
                     <TableRow className="hover:bg-transparent">
                       <TableHead
-                        className="cursor-pointer sticky left-0 top-0 z-40 bg-muted border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)]"
+                        className="cursor-pointer sticky left-0 top-0 z-50 bg-muted border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)]"
                         style={{ minWidth: "140px" }}
                         onClick={() => handleSort("projectId")}
                       >
@@ -1006,7 +1006,7 @@ export default function ProjectsPage() {
                         </div>
                       </TableHead>
                       <TableHead
-                        className="cursor-pointer sticky left-[140px] top-0 z-40 bg-muted border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)]"
+                        className="cursor-pointer sticky left-[140px] top-0 z-50 bg-muted border-b border-r border-border shadow-[2px_0_4px_-2px_rgba(0,0,0,0.08)]"
                         style={{ minWidth: "200px" }}
                         onClick={() => handleSort("name")}
                       >
@@ -1095,7 +1095,6 @@ export default function ProjectsPage() {
                               )}
                             </div>
                           </TableCell>
-
                           <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
                             {getUserNameById(project.managerId) || "-"}
                           </TableCell>

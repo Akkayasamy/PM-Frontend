@@ -328,55 +328,72 @@ export default function TimesheetPage() {
             )}
           </div>
 
-          <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/50">
+          <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-auto max-h-[calc(100vh-220px)] relative w-full isolate">
+            <Table className="min-w-[1100px] w-full border-separate border-spacing-0 table-fixed">
+              <TableHeader className="sticky top-0 z-30 bg-muted shadow-[0_1px_0_0_rgba(0,0,0,0.1)]">
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[120px] text-xs font-bold uppercase">Date</TableHead>
-                  <TableHead className="text-xs font-bold uppercase">Project Info</TableHead>
-                  <TableHead className="text-xs font-bold uppercase">Work Item</TableHead>
-                  <TableHead className="text-xs font-bold uppercase">Description</TableHead>
-                  <TableHead className="w-[100px] text-xs font-bold uppercase text-center">Hours</TableHead>
-                  <TableHead className="w-[100px] text-xs font-bold uppercase text-center">Actions</TableHead>
+                  {/* FIXED HEADER 1: Timesheet ID */}
+                  <TableHead className="text-xs font-bold uppercase sticky left-0 top-0 z-50 bg-muted border-b border-r border-border shadow-[2px_0_0_0_rgba(0,0,0,0.05)] w-[140px]" style={{ minWidth: "140px", maxWidth: "140px" }}>
+                    Timesheet ID
+                  </TableHead>
+
+                  {/* FIXED HEADER 2: Project Info */}
+                  <TableHead className="text-xs font-bold uppercase sticky left-[140px] top-0 z-50 bg-muted border-b border-r border-border w-[220px]" style={{ minWidth: "220px", maxWidth: "220px" }}>
+                    Project Info
+                  </TableHead>
+
+                  <TableHead className="text-xs font-bold uppercase sticky top-0 z-20 bg-muted border-b border-border w-[160px]">Work Item</TableHead>
+                  <TableHead className="text-xs font-bold uppercase sticky top-0 z-20 bg-muted border-b border-border">Description</TableHead>
+                  <TableHead className="w-[120px] text-xs font-bold uppercase sticky top-0 z-20 bg-muted border-b border-border">Date</TableHead>
+                  <TableHead className="w-[100px] text-xs font-bold uppercase text-center sticky top-0 z-20 bg-muted border-b border-border">Hours</TableHead>
+                  <TableHead className="w-[100px] text-xs font-bold uppercase text-center sticky top-0 z-20 bg-muted border-b border-border">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-10"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center py-10 bg-background"><Loader2 className="h-6 w-6 animate-spin mx-auto" /></TableCell></TableRow>
                 ) : paginatedData.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-10 text-muted-foreground">No entries found.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center py-10 text-muted-foreground bg-background">No entries found.</TableCell></TableRow>
                 ) : (
                   paginatedData.map((ts) => (
-                    <TableRow key={ts._id} className="group border-border">
-                      <TableCell className="text-[13px] font-medium">
-                        {new Date(ts.date).toLocaleDateString()}
+                    <TableRow key={ts._id} className="group border-border transition-none">
+                      {/* FIXED CELL 1: Timesheet ID */}
+                      <TableCell className="text-[13px] font-medium sticky left-0 z-10 border-b border-r border-border shadow-[2px_0_0_0_rgba(0,0,0,0.02)] bg-background group-hover:bg-muted w-[140px]" style={{ minWidth: "140px", maxWidth: "140px" }}>
+                        {ts?.timesheetId || "-"}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-[13px] font-semibold text-foreground">{ts.projectId?.name || "N/A"}</span>
-                          <span className="text-[11px] text-muted-foreground">{ts.milestoneId?.name || "General"}</span>
+
+                      {/* FIXED CELL 2: Project Info */}
+                      <TableCell className="sticky left-[140px] z-10 border-b border-r border-border shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)] bg-background group-hover:bg-muted w-[220px]" style={{ minWidth: "220px", maxWidth: "220px" }}>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-[13px] font-semibold text-foreground truncate">{ts.projectId?.name || "N/A"}</span>
+                          <span className="text-[11px] text-muted-foreground truncate">{ts.milestoneId?.name || "General"}</span>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <Badge variant="secondary" className="font-normal text-[11px] w-fit">
+
+                      {/* SCROLLABLE CELLS */}
+                      <TableCell className="border-b border-border bg-background group-hover:bg-muted/60 w-[160px]">
+                        <div className="flex flex-col gap-1 overflow-hidden">
+                          <Badge variant="secondary" className="font-normal text-[11px] w-fit max-w-full truncate block">
                             {ts.taskId?.title || "Direct Work"}
                           </Badge>
                           {ts.subTaskId && (
-                            <span className="text-[10px] text-indigo-500 font-medium ml-1">↳ {ts.subTaskId?.title}</span>
+                            <span className="text-[10px] text-indigo-500 font-medium ml-1 truncate">↳ {ts.subTaskId?.title}</span>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="text-[13px] text-muted-foreground italic max-w-[300px] truncate">
+                      <TableCell className="text-[13px] text-muted-foreground italic max-w-[300px] truncate border-b border-border bg-background group-hover:bg-muted/60">
                         {ts.description}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-[13px] font-medium border-b border-border bg-background group-hover:bg-muted/60">
+                        {new Date(ts.date).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-center border-b border-border bg-background group-hover:bg-muted/60">
                         <Badge className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border-none font-semibold">{ts.hours}h</Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="border-b border-border bg-background group-hover:bg-muted/60">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8  transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 transition-opacity">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>

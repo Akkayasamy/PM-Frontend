@@ -367,7 +367,7 @@ const ProjectTree = ({ milestones = [], refetch }) => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-muted/50 border-b border-border">
-                <th className="py-2.5 px-4 text-left text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 w-20">#</th>
+                <th className="py-2.5 px-4 text-center text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 w-20">#</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400">Milestone Name</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Project Manager</th>
                 <th className="py-2.5 px-3 text-left text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 w-28">Team Leader</th>
