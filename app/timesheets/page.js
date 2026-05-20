@@ -363,7 +363,7 @@ export default function TimesheetPage() {
                       </TableCell>
 
                       {/* FIXED CELL 2: Project Info */}
-                      <TableCell className="sticky left-[140px] z-10 border-b border-r border-border shadow-[4px_0_6px_-2px_rgba(0,0,0,0.08)] bg-background group-hover:bg-muted w-[220px]" style={{ minWidth: "220px", maxWidth: "220px" }}>
+                      <TableCell className="sticky left-[140px] z-10 border-b border-r border-border bg-background group-hover:bg-muted w-[220px]" style={{ minWidth: "220px", maxWidth: "220px" }}>
                         <div className="flex flex-col overflow-hidden">
                           <span className="text-[13px] font-semibold text-foreground truncate">{ts.projectId?.name || "N/A"}</span>
                           <span className="text-[11px] text-muted-foreground truncate">{ts.milestoneId?.name || "General"}</span>

@@ -148,7 +148,7 @@ export default function TasksPage() {
 
   // Memoize data to prevent unnecessary re-renders
   const consultants = useMemo(
-    () => users.filter((u) => u.role === "team_member"),
+    () => users.filter((u) => u.role === "team_member" || u.role === "team_leader"),
     [users]
   );
 
@@ -156,6 +156,7 @@ export default function TasksPage() {
     const loadResponse = async () => {
       try {
         const response = await api.get(`task/user/${user?._id}`);
+        console.log(response, 'response<')
         setTasks(response.data.tasks);
       } catch (err) {
         console.log(err);
@@ -547,7 +548,7 @@ export default function TasksPage() {
 
       // Define the CSV headers
       const headers = [
-        "Task ID",
+        "ID",
         "Title",
         "Description",
         "Project",
@@ -930,7 +931,7 @@ export default function TasksPage() {
                         onClick={() => handleSort("taskId")}
                       >
                         <div className="flex items-center">
-                          Task ID
+                          ID
                           {sortField === "taskId" ? (
                             sortDirection === "asc" ? (
                               <ArrowUp className="ml-2 h-4 w-4" />
@@ -959,6 +960,42 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
+                      <TableHead
+                        className="w-[140px] min-w-[140px] cursor-pointer"
+                        onClick={() => handleSort("projectName")}
+                      >
+                        <div className="flex items-center">
+                          Project
+                          {sortField === "projectName" ? (
+                            sortDirection === "asc" ? (
+                              <ArrowUp className="ml-2 h-4 w-4" />
+                            ) : (
+                              <ArrowDown className="ml-2 h-4 w-4" />
+                            )
+                          ) : (
+                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
+                          )}
+                        </div>
+                      </TableHead>
+
+                      <TableHead
+                        className="w-[140px] min-w-[140px] cursor-pointer"
+                        onClick={() => handleSort("associatedTeam")}
+                      >
+                        <div className="flex items-center">
+                          Associated team
+                          {sortField === "associatedTeam" ? (
+                            sortDirection === "asc" ? (
+                              <ArrowUp className="ml-2 h-4 w-4" />
+                            ) : (
+                              <ArrowDown className="ml-2 h-4 w-4" />
+                            )
+                          ) : (
+                            <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
+                          )}
+                        </div>
+                      </TableHead>
+
                       <TableHead
                         className="w-[140px] min-w-[140px] cursor-pointer"
                         onClick={() => handleSort("startDate")}
@@ -1000,7 +1037,7 @@ export default function TasksPage() {
                         onClick={() => handleSort("functionalConsultant")}
                       >
                         <div className="flex items-center">
-                          Assigned To
+                          Owner
                           {sortField === "functionalConsultant" ? (
                             sortDirection === "asc" ? (
                               <ArrowUp className="ml-2 h-4 w-4" />
@@ -1012,14 +1049,14 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
-
+                      <TableHead className="w-[130px] min-w-[130px]">Status</TableHead>
                       <TableHead
                         className="w-[200px] min-w-[200px] cursor-pointer"
-                        onClick={() => handleSort("projectId")}
+                        onClick={() => handleSort("tags")}
                       >
                         <div className="flex items-center">
-                          Project
-                          {sortField === "projectId" ? (
+                          Tags
+                          {sortField === "tags" ? (
                             sortDirection === "asc" ? (
                               <ArrowUp className="ml-2 h-4 w-4" />
                             ) : (
@@ -1030,8 +1067,6 @@ export default function TasksPage() {
                           )}
                         </div>
                       </TableHead>
-
-                      <TableHead className="w-[130px] min-w-[130px]">Status</TableHead>
                       <TableHead className="w-[130px] min-w-[130px]">Priority</TableHead>
                       <TableHead className="w-[100px] min-w-[100px]">Actions</TableHead>
                     </TableRow>
@@ -1071,6 +1106,13 @@ export default function TasksPage() {
                               )}
                             </div>
                           </TableCell>
+                          <TableCell className="whitespace-nowrap text-xs">
+                            {task?.projectId?.name || '-'}
+                          </TableCell>
+
+                          <TableCell className="whitespace-nowrap text-xs">
+                            {task?.projectId?.teamleadId?.name || '-'}
+                          </TableCell>
 
                           <TableCell className="whitespace-nowrap text-xs">
                             {task.startDate ? task.startDate : ""}
@@ -1083,12 +1125,8 @@ export default function TasksPage() {
                               ? getUser(task.functionalConsultant)?.name || ""
                               : getUser(task.technicalConsultant)?.name || ""}
                           </TableCell>
-                          <TableCell className="truncate max-w-[190px] text-xs">
-                            {task.projectId
-                              ? getProject(task.projectId)?.name || "Unassigned"
-                              : "Unassigned"}
-                          </TableCell>
-                          <TableCell>
+
+                          <TableCell className="!px-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
@@ -1155,7 +1193,10 @@ export default function TasksPage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="truncate max-w-[190px] text-xs">
+                            {task.taskType || "-"}
+                          </TableCell>
+                          <TableCell className="!px-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
@@ -1690,15 +1731,15 @@ export default function TasksPage() {
                           <SelectContent>
                             <SelectItem value="none">None</SelectItem>
                             {consultants
-                              .filter(
-                                (consultant) =>
-                                  consultant.designation?.includes(
-                                    "Functional"
-                                  ) || !consultant.designation
-                              )
-                              .map((consultant) => (
+                              // .filter(
+                              //   (consultant) =>
+                              //     consultant.designation?.includes(
+                              //       "Functional"
+                              //     ) || !consultant.designation
+                              // )
+                              .map((consultant, i) => (
                                 <SelectItem
-                                  key={consultant._id}
+                                  key={i}
                                   value={consultant._id}
                                 >
                                   {consultant.name}
@@ -1724,12 +1765,12 @@ export default function TasksPage() {
                           <SelectContent>
                             <SelectItem value="none">None</SelectItem>
                             {consultants
-                              .filter(
-                                (consultant) =>
-                                  consultant.designation?.includes(
-                                    "Technical"
-                                  ) || !consultant.designation
-                              )
+                              // .filter(
+                              //   (consultant) =>
+                              //     consultant.designation?.includes(
+                              //       "Technical"
+                              //     ) || !consultant.designation
+                              // )
                               .map((consultant) => (
                                 <SelectItem
                                   key={consultant._id}
@@ -2141,12 +2182,12 @@ export default function TasksPage() {
                           <SelectContent>
                             <SelectItem value="none">None</SelectItem>
                             {consultants
-                              .filter(
-                                (consultant) =>
-                                  consultant.designation?.includes(
-                                    "Functional"
-                                  ) || !consultant.designation
-                              )
+                              // .filter(
+                              //   (consultant) =>
+                              //     consultant.designation?.includes(
+                              //       "Functional"
+                              //     ) || !consultant.designation
+                              // )
                               .map((consultant) => (
                                 <SelectItem
                                   key={consultant._id}
@@ -2175,12 +2216,12 @@ export default function TasksPage() {
                           <SelectContent>
                             <SelectItem value="none">None</SelectItem>
                             {consultants
-                              .filter(
-                                (consultant) =>
-                                  consultant.designation?.includes(
-                                    "Technical"
-                                  ) || !consultant.designation
-                              )
+                              // .filter(
+                              //   (consultant) =>
+                              //     consultant.designation?.includes(
+                              //       "Technical"
+                              //     ) || !consultant.designation
+                              // )
                               .map((consultant) => (
                                 <SelectItem
                                   key={consultant._id}

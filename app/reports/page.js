@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import ProtectedRoute from '@/components/protected-route';
 
 export default function ReportsListPage() {
     const [projects, setProjects] = useState([]);
@@ -371,7 +372,7 @@ export default function ReportsListPage() {
                                                 value={filters.userId}
                                                 onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
                                             >
-                                                <option value="all">All Employees</option>
+                                                <option value="all">All Teams</option>
                                                 {users.map(u => (u?.role == "project_manager" || u?.role == "Team Leader") && (<option key={u._id} value={u._id}>{u.name}</option>))}
                                             </select>
                                         </div>
